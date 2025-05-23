@@ -62,7 +62,7 @@ dkms.conf
 *.str                       # state reports / checkpoints
 *.ltx                       # latency reports
 *.webtalk                   # telemetry
-
+*.ip_user_files
 # SDK / Vitis (if you use them)
 .sdk/
 .vitis/
