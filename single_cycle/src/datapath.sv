@@ -15,7 +15,7 @@ module datapath
     
     logic [31:0] PCNext, PCPlus4, PCTarget;
     logic [31:0] ImmExt;
-    logic [31:0] SrcA, srcB;
+    logic [31:0] SrcA, SrcB;
     logic [31:0] Result;
     
     //  PC Next Logic

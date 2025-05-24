@@ -4,9 +4,10 @@ module alu_tb;
                 N = 32;     //  XLEN width
                   
     logic clk, reset;
-    logic [N-1:0] a, b, y;
-    logic [2:0] alucontrol;
-    alu alu1(.a(a), .b(b), .alucontrol(alucontrol), .y(y));
+    logic [N-1:0] a, b, ALUResult;
+    logic [2:0] ALUControl;
+    logic Zero;
+    alu alu1(.a(a), .b(b), .ALUControl(ALUControl), .ALUResult, .Zero);
     
     always
         begin
@@ -20,13 +21,13 @@ module alu_tb;
         begin
             a = 32'b011;
             b = 32'b0100;
-            alucontrol = 3'b000;
+            ALUControl = 3'b000;
             repeat(2) @(negedge clk);
-            alucontrol = 3'b001;
+            ALUControl = 3'b001;
             @(negedge clk);
-            alucontrol = 3'b010;
+            ALUControl = 3'b010;
             @(negedge clk);
-            alucontrol = 3'b011;
+            ALUControl = 3'b011;
             @(negedge clk);
             $stop;
         
