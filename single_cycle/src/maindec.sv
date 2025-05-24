@@ -3,7 +3,7 @@ module maindec
         input logic [6:0]   op,
         output logic        RegWrite,
         output logic        Jump,
-        output logic [1:0]  ImmSrc,
+        output logic [1:0]  immsrc,
         output logic        ALUSrc,
         output logic        MemWrite,
         output logic        Branch,
@@ -15,7 +15,7 @@ module maindec
     //  control signal declaration
     logic [10:0] controls;
     
-    assign {RegWrite, ImmSrc, ALUSrc, MemWrite,
+    assign {RegWrite, immsrc, ALUSrc, MemWrite,
             ResultSrc, Branch, ALUOp, Jump} = controls;
     
     always_comb

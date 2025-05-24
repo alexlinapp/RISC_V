@@ -9,7 +9,7 @@ module extend
         begin
             case(immsrc)
                 //  I-type
-                2'b00:  immnext = $sign(instr[31:20]);
+                2'b00:  immext = $sign(instr[31:20]);
                 //  S-type
                 2'b01:  immext = $sign({instr[31:25], instr[11:7]});
                 //  B-type
