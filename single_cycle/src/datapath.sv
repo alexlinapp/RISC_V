@@ -25,7 +25,7 @@ module datapath
     mux2 #(32)  pcmux(.d0(PCPlus4), .d1(PCTarget), .s(PCSrc), .y(PCNext));
     
     //  register file logic
-    regfile     rf(.clk, .RegWrite, .a1(instr[19:15]), .a2(instr[24:20], .a3(instr[11:7]), 
+    regfile     rf(.clk, .we3(RegWrite), .a1(instr[19:15]), .a2(instr[24:20]), .a3(instr[11:7]), 
                     .wd3(Result), .rd1(SrcA), .rd2(WriteData));     
                     //  WriteData used here instead SrcB since it is WriteData signal being driven
     extend      ext(.instr(instr[31:7]), .immsrc, .immext);
