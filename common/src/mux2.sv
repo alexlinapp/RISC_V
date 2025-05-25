@@ -5,5 +5,5 @@ module mux2
         input   logic               s,
         output  logic [WIDTH-1:0]   y
     );
-    assign y = s ? d0 : d1;
+    assign y = s ? d1 : d0;
 endmodule

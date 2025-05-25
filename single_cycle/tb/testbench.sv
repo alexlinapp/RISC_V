@@ -27,12 +27,12 @@ module testbench();
     //  verify results
     always @(negedge clk)
         begin
-            $display("test");
             if (MemWrite)
                 begin
                     if (DataAdr === 100 && WriteData === 25)
                         begin
                             $display("Simulation Success");
+                            #10;
                             $stop;
                         end
                     else if (DataAdr !== 96)

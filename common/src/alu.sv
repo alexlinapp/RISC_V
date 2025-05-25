@@ -13,7 +13,7 @@ module alu
             3'b001: ALUResult = a - b;
             3'b010: ALUResult = a & b;
             3'b011: ALUResult = a | b;
-            3'b000: ALUResult = (a < b) ? 'b1 : 'b0;    //  SLT (Set if Less than)
+            3'b101: ALUResult = (a < b) ? 'b1 : 'b0;    //  SLT (Set if Less than)
             default: ALUResult = 'x;
         endcase
     end

@@ -6,7 +6,7 @@ module aludec
         input logic [1:0]   ALUOp,
         output logic [2:0]  ALUControl
     );
-    logic RTypeSub;
+    logic RtypeSub;
     assign RtypeSub = funct7b5 & opb5;  //  TRUE for R-type subtract
     
     always_comb

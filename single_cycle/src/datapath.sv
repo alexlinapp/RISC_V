@@ -20,7 +20,7 @@ module datapath
     
     //  PC Next Logic
     dff #(32)   pcreg(.clk, .reset, .d(PCNext), .q(PC));
-    adder       pcadd4(.a(PC), .b(32'd4), .y(PCPlus4));
+    adder       pcadd4(.a(PC), .b(32'b100), .y(PCPlus4));
     adder       pcaddbranch(.a(PC), .b(immext), .y(PCTarget));  
     mux2 #(32)  pcmux(.d0(PCPlus4), .d1(PCTarget), .s(PCSrc), .y(PCNext));
     
