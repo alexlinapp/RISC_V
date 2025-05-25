@@ -12,7 +12,7 @@ module riscvsingle
     logic       ALUSrc, RegWrite, Jump, Zero;
     logic       PCSrc;
     logic [1:0] ResultSrc, immsrc;
-    logic [2:0] ALUControl;
+    logic [3:0] ALUControl;
     
     controller c(.op(instr[6:0]), .funct3(instr[14:12]), .funct7b5(instr[30]),
                     .Zero, .ResultSrc, .MemWrite, .PCSrc, .ALUSrc, .RegWrite,

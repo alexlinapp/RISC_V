@@ -5,9 +5,9 @@ module alu_tb;
                   
     logic clk, reset;
     logic [N-1:0] a, b, ALUResult;
-    logic [2:0] ALUControl;
+    logic [3:0] ALUControl;
     logic Zero;
-    alu alu1(.a(a), .b(b), .ALUControl(ALUControl), .ALUResult, .Zero);
+    alu alu1(.*);
     
     always
         begin
@@ -19,16 +19,25 @@ module alu_tb;
     
     initial
         begin
-            a = 32'b011;
-            b = 32'b0100;
-            ALUControl = 3'b000;
-            repeat(2) @(negedge clk);
-            ALUControl = 3'b001;
-            @(negedge clk);
-            ALUControl = 3'b010;
-            @(negedge clk);
-            ALUControl = 3'b011;
-            @(negedge clk);
+                a = '1;
+                b = 32'b100;
+                ALUControl = 4'b0111;
+                repeat (2) @(posedge clk);
+                a = 32'b011;
+                b = 32'b101;
+                ALUControl = 4'b0100;
+                //ALUControl = 4'b0000;
+                repeat(2) @(posedge clk);
+                a = 32'b011;
+                b = 32'b001;
+                ALUControl = 4'b0110;
+                @(posedge clk);
+                a = '1;
+                b = 32'b010;
+                ALUControl = 4'b0111;
+                repeat (2) @(posedge clk);
+                ALUControl = 4'b1000;
+                @(posedge clk);
             $stop;
         
         end

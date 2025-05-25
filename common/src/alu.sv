@@ -2,18 +2,22 @@ module alu
     #(parameter XLEN = 32)
     (
         input   logic [XLEN-1:0]    a, b,
-        input   logic [2:0]         ALUControl,
+        input   logic [3:0]         ALUControl,
         output  logic [XLEN-1:0]    ALUResult,
         output  logic               Zero
     );
     always_comb 
     begin
         case(ALUControl)
-            3'b000: ALUResult = a + b;
-            3'b001: ALUResult = a - b;
-            3'b010: ALUResult = a & b;
-            3'b011: ALUResult = a | b;
-            3'b101: ALUResult = (a < b) ? 'b1 : 'b0;    //  SLT (Set if Less than)
+            4'b0000: ALUResult = a + b;
+            4'b0001: ALUResult = a - b;
+            4'b0010: ALUResult = a & b;
+            4'b0011: ALUResult = a | b;
+            4'b0100: ALUResult = a ^ b;
+            4'b0101: ALUResult = (a < b) ? 'b1 : 'b0;    //  SLT (Set if Less than)
+            4'b0110: ALUResult = a >> b[4:0];
+            4'b0111: ALUResult = $signed(a) >>> b[4:0];
+            4'b1000: ALUResult = a << b[4:0];
             default: ALUResult = 'x;
         endcase
     end

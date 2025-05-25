@@ -9,7 +9,7 @@ module controller
         output  logic       PCSrc, ALUSrc,
         output  logic       RegWrite, Jump,
         output  logic [1:0] immsrc,
-        output  logic [2:0] ALUControl
+        output  logic [3:0] ALUControl
     );
     //  internal signals
     logic [1:0] ALUOp;

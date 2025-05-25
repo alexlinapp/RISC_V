@@ -5,7 +5,7 @@ module datapath
         input   logic           PCSrc, ALUSrc,
         input   logic           RegWrite,
         input   logic [1:0]     immsrc,
-        input   logic [2:0]     ALUControl,
+        input   logic [3:0]     ALUControl,
         input   logic [31:0]    instr,          
         input   logic [31:0]    ReadData,
         output  logic           Zero,
