@@ -1,3 +1,27 @@
+addi x1, x0, 5
+addi x2, x0, 5
+addi x10, x0, 0
+beq x1, x2, beq1
+addi x10, x10, 1
+beq1:
+addi x2, x0, 4
+bne x0, x0, bne1
+addi x10, x10, 2
+bne1:
+blt x1, x2, blt1
+addi x10, x10, 4
+blt1:
+bge x1, x2, bge1
+addi x10, x10, 8
+bge1:
+addi x1, x0 -1
+addi x2, x0, 1
+bltu x1, x2, bltu1
+addi x10, x10, 16
+bltu1:
+bgeu x1, x2, bgeu1
+addi x10, x10, 32
+bgeu1:
 00500093
 00500113
 00000513

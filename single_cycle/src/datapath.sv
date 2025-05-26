@@ -17,6 +17,7 @@ module datapath
     logic [31:0] immext;
     logic [31:0] SrcA, SrcB;
     logic [31:0] Result;
+    logic [31:0] ReadDataSelected;
     
     //  PC Next Logic
     dff #(32)   pcreg(.clk, .reset, .d(PCNext), .q(PC));
@@ -34,8 +35,9 @@ module datapath
     mux2 #(32)  srcbmux(.d0(WriteData), .d1(immext), .s(ALUSrc), .y(SrcB));
     alu         alu(.a(SrcA), .b(SrcB), .ALUControl, .ALUResult, .Zero,
                     .LessThan, .LessThanUnsigned);
-    mux3 #(32)  resultmux(.d0(ALUResult), .d1(ReadData), 
+    mux3 #(32)  resultmux(.d0(ALUResult), .d1(ReadDataSelected), 
                             .d2(PCPlus4), .s(ResultSrc), .y(Result));  
-                            
+    dmemselect  dmemselect1(.ReadData, .funct3(instr[14:12]), .ReadDataSelected);  
+                          
                                            
 endmodule

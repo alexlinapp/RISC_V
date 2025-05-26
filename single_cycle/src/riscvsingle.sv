@@ -15,7 +15,8 @@ module riscvsingle
     logic [3:0] ALUControl;
     
     controller c(.op(instr[6:0]), .funct3(instr[14:12]), .funct7b5(instr[30]),
-                    .Zero, .ResultSrc, .MemWrite, .PCSrc, .ALUSrc, .RegWrite,
+                    .Zero, .LessThan, .LessThanUnsigned,
+                    .ResultSrc, .MemWrite, .PCSrc, .ALUSrc, .RegWrite,
                     .Jump, .immsrc, .ALUControl);
     datapath dp(.clk, .reset, .ResultSrc, .PCSrc, 
                 .ALUSrc, .RegWrite, .immsrc, .ALUControl, .Zero,

@@ -1,8 +1,8 @@
 module branchdec
     (
-        input   logic Zero, LessThan, LessThanUnsigned, 
-        input   logic funct3,
-        output  logic BranchC
+        input   logic       Zero, LessThan, LessThanUnsigned, 
+        input   logic [2:0] funct3,
+        output  logic       BranchC
     );
     
     always_comb
