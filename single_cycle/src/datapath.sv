@@ -8,7 +8,7 @@ module datapath
         input   logic [3:0]     ALUControl,
         input   logic [31:0]    instr,          
         input   logic [31:0]    ReadData,
-        output  logic           Zero,
+        output  logic           Zero, LessThan, LessThanUnsigned,
         output  logic [31:0]    ALUResult, WriteData,
         output  logic [31:0]    PC     
     );
@@ -32,7 +32,8 @@ module datapath
     
     //  ALU Logic
     mux2 #(32)  srcbmux(.d0(WriteData), .d1(immext), .s(ALUSrc), .y(SrcB));
-    alu         alu(.a(SrcA), .b(SrcB), .ALUControl, .ALUResult, .Zero);
+    alu         alu(.a(SrcA), .b(SrcB), .ALUControl, .ALUResult, .Zero,
+                    .LessThan, .LessThanUnsigned);
     mux3 #(32)  resultmux(.d0(ALUResult), .d1(ReadData), 
                             .d2(PCPlus4), .s(ResultSrc), .y(Result));  
                             

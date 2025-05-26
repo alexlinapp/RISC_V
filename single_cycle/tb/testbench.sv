@@ -27,7 +27,7 @@ module testbench();
     //  verify results
     initial
         begin
-            repeat (10) @(posedge clk);
+            repeat (20) @(posedge clk);
             $stop;
         
         end

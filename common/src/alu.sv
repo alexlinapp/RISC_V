@@ -4,7 +4,9 @@ module alu
         input   logic [XLEN-1:0]    a, b,
         input   logic [3:0]         ALUControl,
         output  logic [XLEN-1:0]    ALUResult,
-        output  logic               Zero
+        output  logic               Zero,
+        output  logic               LessThan,
+        output  logic               LessThanUnsigned
     );
     always_comb 
     begin
@@ -24,4 +26,6 @@ module alu
     end
     
     assign Zero = ALUResult ? 1'b0 : 1'b1;
+    assign LessThan = ($signed(a) < $signed(b)) ? 'b1 : 'b0;
+    assign LessThanUnsigned = (a < b) ? 'b1 : 'b0;
 endmodule
