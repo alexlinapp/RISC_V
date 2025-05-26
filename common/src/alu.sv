@@ -14,10 +14,11 @@ module alu
             4'b0010: ALUResult = a & b;
             4'b0011: ALUResult = a | b;
             4'b0100: ALUResult = a ^ b;
-            4'b0101: ALUResult = (a < b) ? 'b1 : 'b0;    //  SLT (Set if Less than)
+            4'b0101: ALUResult = ($signed(a) < $signed(b)) ? 'b1 : 'b0;    //  SLT (Set if Less than [signed])
             4'b0110: ALUResult = a >> b[4:0];
             4'b0111: ALUResult = $signed(a) >>> b[4:0];
             4'b1000: ALUResult = a << b[4:0];
+            4'b1001: ALUResult = (a < b) ? 'b1 : 'b0;                       // SLTU (Set if less than, unsigned comparison)
             default: ALUResult = 'x;
         endcase
     end

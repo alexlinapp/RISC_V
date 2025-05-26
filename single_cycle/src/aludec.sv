@@ -20,6 +20,7 @@ module aludec
                                             ALUControl = 4'b000;    //  add, addi
                             3'b001:     ALUControl = 4'b1000;       //  sll
                             3'b010:     ALUControl = 4'b101;        //  slt, slti
+                            3'b011:     ALUControl = 4'b1001;       //  sltu
                             3'b100:     ALUControl = 4'b100;        //  xor
                             3'b101:     if (funct7b5)   
                                             ALUControl = 4'b0111;   //  sra
