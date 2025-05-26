@@ -6,6 +6,7 @@ module controller
         input   logic       Zero, LessThan, LessThanUnsigned,
         output  logic [1:0] ResultSrc,
         output  logic       MemWrite,
+        output  logic [3:0] MemWriteSelect,
         output  logic       PCSrc, ALUSrc,
         output  logic       RegWrite, Jump, JumpALR, 
         output  logic [2:0] immsrc,
@@ -19,6 +20,8 @@ module controller
                 .Jump, .JumpALR, .immsrc, .ALUOp);
     aludec ad(.opb5(op[5]), .funct3, .funct7b5, .ALUOp, .ALUControl);
     
+    memdec memd(.MemWrite, .funct3, .MemWriteSelect); 
+        
     branchdec bd(.Zero, .LessThan, .LessThanUnsigned, .funct3, .BranchC);
     assign PCSrc = Branch & BranchC | Jump;        //  Replaced Zero with BranchC, where BranchC is the actual condition
 endmodule

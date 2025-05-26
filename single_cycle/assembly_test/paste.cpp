@@ -1,15 +1,5 @@
-// addi x1, x0, 3
-// jal x2, FIRST
-// or x0, x0, x0
-// or x0, x0, x0
-// FIRST:
-// jalr x3, x1, 5
-// or x0, x0, x0
-// or x0, x0, x0
-// or x0, x0, x0
-// or x0, x0, x0
-// SECOND:
-// or x0, x0, x0
-// or x0, x0, x0
-// or x0, x0, x0
-// or x0, x0, x0
+// addi x1, x0, 5
+// auipc x2, 5
+// lui x3, 0x5A
+// lui x4, 1
+// auipc x5, 10

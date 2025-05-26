@@ -3,9 +3,10 @@ module testbench();
     logic           reset;
     logic [31:0]    WriteData, DataAdr;
     logic           MemWrite;
+    logic [3:0]     MemWriteSelect;
     
     //  instantiate device to be tested
-    top dut(.clk, .reset, .WriteData, .DataAdr, .MemWrite);
+    top dut(.clk, .reset, .WriteData, .DataAdr, .MemWrite, .MemWriteSelect);
     
     //  initialize test
     initial

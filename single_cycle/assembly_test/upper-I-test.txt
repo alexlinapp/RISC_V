@@ -1,3 +1,8 @@
+// addi x1, x0, 5
+// auipc x2, 5
+// lui x3, 0x5A
+// lui x4, 1
+// auipc x5, 10
 00500093
 00005117
 0005a1b7
