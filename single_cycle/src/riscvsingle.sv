@@ -9,7 +9,7 @@ module riscvsingle
         input   logic [XLEN-1:0]    ReadData
     );
     
-    logic       ALUSrc, RegWrite, Jump, Zero, LessThan, LessThanUnsigned;
+    logic       ALUSrc, RegWrite, Jump, JumpALR, Zero, LessThan, LessThanUnsigned;
     logic       PCSrc;
     logic [1:0] ResultSrc, immsrc;
     logic [3:0] ALUControl;
@@ -17,8 +17,8 @@ module riscvsingle
     controller c(.op(instr[6:0]), .funct3(instr[14:12]), .funct7b5(instr[30]),
                     .Zero, .LessThan, .LessThanUnsigned,
                     .ResultSrc, .MemWrite, .PCSrc, .ALUSrc, .RegWrite,
-                    .Jump, .immsrc, .ALUControl);
+                    .Jump, .JumpALR, .immsrc, .ALUControl);
     datapath dp(.clk, .reset, .ResultSrc, .PCSrc, 
-                .ALUSrc, .RegWrite, .immsrc, .ALUControl, .Zero,
+                .ALUSrc, .RegWrite, .JumpALR, .immsrc, .ALUControl, .Zero,
                 .LessThan, .LessThanUnsigned, .PC, .instr, .ALUResult, .WriteData, .ReadData);
 endmodule
