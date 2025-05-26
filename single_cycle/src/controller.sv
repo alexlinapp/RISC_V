@@ -8,7 +8,7 @@ module controller
         output  logic       MemWrite,
         output  logic       PCSrc, ALUSrc,
         output  logic       RegWrite, Jump, JumpALR, 
-        output  logic [1:0] immsrc,
+        output  logic [2:0] immsrc,
         output  logic [3:0] ALUControl
     );
     //  internal signals

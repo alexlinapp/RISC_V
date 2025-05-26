@@ -5,7 +5,7 @@ module datapath
         input   logic           PCSrc, ALUSrc,
         input   logic           RegWrite,
         input   logic           JumpALR,
-        input   logic [1:0]     immsrc,
+        input   logic [2:0]     immsrc,
         input   logic [3:0]     ALUControl,
         input   logic [31:0]    instr,          
         input   logic [31:0]    ReadData,
@@ -17,7 +17,7 @@ module datapath
     logic [31:0] PCNext, PCPlus4, PCTarget, PCTargetJ;
     logic [31:0] immext;
     logic [31:0] SrcA, SrcB;
-    logic [31:0] Result;
+    logic [31:0] ResultU, Result;
     logic [31:0] ReadDataSelected;
     
     //  PC Next Logic
@@ -31,14 +31,15 @@ module datapath
                     .wd3(Result), .rd1(SrcA), .rd2(WriteData));     
                     //  WriteData used here instead SrcB since it is WriteData signal being driven
     extend      ext(.instr(instr[31:7]), .immsrc, .immext);
-    
+    //  U-Type Logic instr[5] = opb5
+    mux2 #(32) resultUmux(.d0(PCTarget), .d1(immext), .s(instr[5]), .y(ResultU));  
     
     //  ALU Logic
     mux2 #(32)  srcbmux(.d0(WriteData), .d1(immext), .s(ALUSrc), .y(SrcB));
     alu         alu(.a(SrcA), .b(SrcB), .ALUControl, .ALUResult, .Zero,
                     .LessThan, .LessThanUnsigned);
-    mux3 #(32)  resultmux(.d0(ALUResult), .d1(ReadDataSelected), 
-                            .d2(PCPlus4), .s(ResultSrc), .y(Result));  
+    mux4 #(32)  resultmux(.d0(ALUResult), .d1(ReadDataSelected), 
+                            .d2(PCPlus4), .d3(ResultU), .s(ResultSrc), .y(Result));  
     dmemselect  dmemselect1(.ReadData, .funct3(instr[14:12]), .ReadDataSelected);  
                           
                                            

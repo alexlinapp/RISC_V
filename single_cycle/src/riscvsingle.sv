@@ -11,7 +11,8 @@ module riscvsingle
     
     logic       ALUSrc, RegWrite, Jump, JumpALR, Zero, LessThan, LessThanUnsigned;
     logic       PCSrc;
-    logic [1:0] ResultSrc, immsrc;
+    logic [1:0] ResultSrc;
+    logic [2:0] immsrc;
     logic [3:0] ALUControl;
     
     controller c(.op(instr[6:0]), .funct3(instr[14:12]), .funct7b5(instr[30]),

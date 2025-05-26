@@ -1,7 +1,7 @@
 module extend
     (
         input logic     [31:7]  instr,
-        input logic     [1:0]   immsrc,
+        input logic     [2:0]   immsrc,
         output logic    [31:0]  immext
     );
     
@@ -9,13 +9,15 @@ module extend
         begin
             case(immsrc)
                 //  I-type
-                2'b00:  immext = $signed(instr[31:20]);
+                3'b000:  immext = $signed(instr[31:20]);
                 //  S-type
-                2'b01:  immext = $signed({instr[31:25], instr[11:7]});
+                3'b001:  immext = $signed({instr[31:25], instr[11:7]});
                 //  B-type
-                2'b10:  immext = $signed({instr[31], instr[7], instr[30:25], instr[11:8], 1'b0});
+                3'b010:  immext = $signed({instr[31], instr[7], instr[30:25], instr[11:8], 1'b0});
                 //  J-type
-                2'b11:  immext = $signed({instr[31], instr[19:12], instr[20], instr[30:21], 1'b0});
+                3'b011:  immext = $signed({instr[31], instr[19:12], instr[20], instr[30:21], 1'b0});
+                //  U-type
+                3'b100:  immext = {instr[31:12], 12'b0};
                 default:    immext = 'bx;   //  undefined
             endcase
         end
