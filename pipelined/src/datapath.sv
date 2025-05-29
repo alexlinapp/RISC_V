@@ -42,5 +42,6 @@ module datapath
                             .d2(PCPlus4), .d3(ResultU), .s(ResultSrc), .y(Result));  
     dmemselect  dmemselect1(.ReadData, .funct3(instr[14:12]), .ReadDataSelected);  
                           
-                                           
+    //  pipelines: Fetch->Decode->Execute->Memory->WriteBack
+                                   
 endmodule
