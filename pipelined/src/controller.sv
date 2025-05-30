@@ -8,12 +8,13 @@ module controller
         output  logic       ALUSrcD,
         output  logic       RegWriteD, JumpD, JumpALRD, BranchD,
         output  logic [2:0] immsrcD,
-        output  logic [3:0] ALUControlD
+        output  logic [3:0] ALUControlD,
+        output logic        UsesRs1D, UsesRs2D 
     );
     //  internal signals
     logic [1:0] ALUOp;
     maindec md(.op, .ResultSrcD, .MemWriteD, .BranchD, .ALUSrcD, .RegWriteD,
-                .JumpD, .JumpALRD, .immsrcD, .ALUOp);
+                .JumpD, .JumpALRD, .immsrcD, .ALUOp, .UsesRs1D, .UsesRs2D);
     aludec ad(.opb5(op[5]), .funct3(funct3D), .funct7b5(funct7b5D), 
                 .ALUOp, .ALUControl(ALUControlD));
     

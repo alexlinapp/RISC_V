@@ -5,6 +5,6 @@ module imem
     );
     logic [31:0] RAM[63:0];     // 64 x 32 memory
     initial
-        $readmemh("C:/Users/NODDL/RISC_V/pipelined/testfiles/simpletest1.txt", RAM);
+        $readmemh("C:/Users/NODDL/RISC_V/pipelined/testfiles/jump-test.txt", RAM);
     assign rd = RAM[a[31:2]];   //  word aligned
 endmodule

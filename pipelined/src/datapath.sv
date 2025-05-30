@@ -10,8 +10,9 @@ module datapath
         input   logic [3:0]     ALUControlD,
         input   logic [31:0]    instrF, 
         input   logic           MemWriteD, 
-        input   logic [31:0]    ReadDataM,        
-        output  logic [31:0]    ALUResultE, WriteDataM,
+        input   logic [31:0]    ReadDataM, 
+        input   logic           UsesRs1D, UsesRs2D,       
+        output  logic [31:0]    ALUResultM, WriteDataM,
         output  logic [31:0]    PC,     
         output  logic           MemWrite,
         output  logic [3:0]     MemWriteSelect,
@@ -48,14 +49,15 @@ module datapath
     logic [4:0]         Rs1E, Rs2E, RdE;
     logic [XLEN-1:0]    WriteDataE;
     logic [XLEN-1:0]    RD1E, RD2E;
+    logic [XLEN-1:0]    ALUResultE;
     
-    logic [XLEN-1:0]    PCSrcE;
+    logic               PCSrcE;
     logic [31:0]        immextE;
     logic [XLEN-1:0]    SrcAE, SrcBE;
+    logic [XLEN-1:0]    PCTargetE;
     // instruction memory signals
     logic               RegWriteM, MemWriteM;
     logic [1:0]         ResultSrcM;
-    logic [XLEN-1:0]    ALUResultM;
     logic [4:0]         RdM;
     logic [XLEN-1:0]    PCPlus4M, PCTargetM;
     logic [2:0]         funct3M;
@@ -70,11 +72,16 @@ module datapath
     logic [XLEN-1:0]    ResultWB;
     
     
+    //  Hazard Unit Signal Declaration
+    logic StallF, StallD, FlushD, FlushE;
+    logic [1:0] ForwardAE, ForwardBE; 
+    
+    
     //  Instruction Fetch Stage
-    //  PC Next Logic
-    dff #(32)   pcreg(.clk, .reset, .d(PCNextF), .q(PC));
+    //  PC Next Logic, PC = PCF
+    dff_nen #(32)   pcreg(.clk, .reset, .en(StallF), .d(PCNextF), .q(PC));
     adder       pcadd4(.a(PC), .b(32'b100), .y(PCPlus4F));
-    adder       pcaddbranch(.a(PC), .b(immextD), .y(PCTarget));  
+    adder       pcaddbranch(.a(PCE), .b(immextE), .y(PCTargetE));  
     mux2 #(32)  pcmux(.d0(PCPlus4F), .d1(PCTargetJF), .s(PCSrcE), .y(PCNextF));
     mux2 #(32)  pcJmux(.d0(PCTargetE), .d1(ALUResultE), .s(JumpALRE), .y(PCTargetJF));
     
@@ -102,7 +109,7 @@ module datapath
     mux2 #(32)  srcbmux(.d0(WriteDataE), .d1(immextE), .s(ALUSrcE), .y(SrcBE));
     alu         alu1(.a(SrcAE), .b(SrcBE), .ALUControl(ALUControlE), .ALUResult(ALUResultE), 
                     .Zero(ZeroE), .LessThan(LessThanE), .LessThanUnsigned(LessThanUnsignedE));
-    
+    //  forwarding muxes
     mux4 #(32)  forwardbmux(.d0(RD2E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardBE), .y(WriteDataE));
     mux4 #(32)  forwardamux(.d0(RD1E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardAE), .y(SrcAE));
     //  branch decode logic
@@ -133,20 +140,20 @@ module datapath
     mux2 #(32) resultUmux(.d0(PCTargetM), .d1(immextD), .s(instrD[5]), .y(ResultUM));  
     
     
-    //  writeback stage
+    //  writeback stage, none need, no components in this stage, uses other components
     
     
     
     
     //  Hazard Unit     
-    //  signal declaration
-    logic StallF, StallD, FlushD, FlushE;
-    logic [1:0] ForwardAE, ForwardBE; 
+    
+    
+    hazardunit HU(.*);
     // temp values for now
-    assign StallD = 0;
-    assign StallF = 0;
-    assign ForwardAE = 2'b00;
-    assign ForwardBE = 2'b00;
+//    assign StallD = 0;
+//    assign StallF = 0;
+//    assign ForwardAE = 2'b00;
+//    assign ForwardBE = 2'b00;
     //  pipeline registers
     IF_ID_REG   IFIDREG(.clk, .clr(FlushD), .en(StallD), .instrF, .PCF(PC), .PCPlus4F,
                         .instrD, .PCD, .PCPlus4D, .reset);

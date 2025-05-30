@@ -1,11 +1,16 @@
-// addi x1, x0, 5
-// addi x2, x0, -1
-// beq x1, x0, FIRST
-// addi x8, x0, 1
-// FIRST:
-// bge x1, x2, SECOND
-// addi x8, x8, 2
-// SECOND:
-// bgeu x1, x2, THIRD
-// addi x8, x8, 4
-// THIRD:
+
+addi x1, x0, 3
+jal x2, FIRST
+or x0, x0, x0
+or x0, x0, x0
+FIRST:
+jalr x3, x1, 5
+or x0, x0, x0
+or x0, x0, x0
+or x0, x0, x0
+or x0, x0, x0
+SECOND:
+or x0, x0, x0
+or x0, x0, x0
+or x0, x0, x0
+or x0, x0, x0

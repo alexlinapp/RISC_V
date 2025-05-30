@@ -27,7 +27,7 @@ module alu
             4'b0110:    ALUResult = a >> b;         //  srl
             4'b0111:    ALUResult = $signed(a) >>> b;   //  sra
             4'b1000:    ALUResult = a << b;         //  sll
-            4'b1001:    ALUResult = ~cout;          //  sltu   
+            4'b1001:    ALUResult = {'0, ~cout};          //  sltu   
             default:    ALUResult = 'x;    
         endcase
     assign z = (ALUResult == 32'b0);

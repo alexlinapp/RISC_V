@@ -11,7 +11,9 @@ module regfile
     //  three ported register file
     logic [XLEN-1:0] rf[31:0];
     
-    always_ff @(posedge clk)
+    //  write occurs on the negative edge of clk (first half of cycle)
+    //  read occurs on second half of cycle
+    always_ff @(negedge clk)
         if (we3)
             rf[a3] <= wd3;
     assign rd1 = (a1 != 0) ? rf[a1] : 0;   //  of a1 = 0, zero register by definition holds 0

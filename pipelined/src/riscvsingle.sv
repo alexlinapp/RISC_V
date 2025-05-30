@@ -16,13 +16,15 @@ module riscvsingle
     logic [3:0] ALUControlD;
     logic       MemWriteD;
     logic [31:0] instrD;
+    logic       UsesRs1D, UsesRs2D;
    
     controller c(.op(instrD[6:0]), .funct3D(instrD[14:12]), .funct7b5D(instrD[30]),
                     .ResultSrcD, .MemWriteD, .ALUSrcD, .RegWriteD,
-                    .JumpD, .BranchD, .JumpALRD, .immsrcD, .ALUControlD);
+                    .JumpD, .BranchD, .JumpALRD, .immsrcD, .ALUControlD,
+                    .UsesRs1D, .UsesRs2D);
     datapath dp(.clk, .reset, .ResultSrcD,
                 .ALUSrcD, .RegWriteD, .JumpALRD, .JumpD, .BranchD, .immsrcD, .ALUControlD, 
-                .PC, .instrF(instr), .ALUResultE(ALUResult), 
+                .PC, .instrF(instr), .ALUResultM(ALUResult), 
                 .WriteDataM(WriteData), .ReadDataM(ReadData), .MemWriteD,
-                .MemWrite, .MemWriteSelect, .instrD);
+                .MemWrite, .MemWriteSelect, .instrD, .UsesRs1D, .UsesRs2D);
 endmodule
