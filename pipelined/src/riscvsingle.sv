@@ -10,17 +10,19 @@ module riscvsingle
         input   logic [XLEN-1:0]    ReadData
     );
     
-    logic       ALUSrc, RegWrite, Jump, JumpALR, Zero, LessThan, LessThanUnsigned;
-    logic       PCSrc;
-    logic [1:0] ResultSrc;
-    logic [2:0] immsrc;
-    logic [3:0] ALUControl;
-    
-    controller c(.op(instr[6:0]), .funct3(instr[14:12]), .funct7b5(instr[30]),
-                    .Zero, .LessThan, .LessThanUnsigned,
-                    .ResultSrc, .MemWrite, .MemWriteSelect, .PCSrc, .ALUSrc, .RegWrite,
-                    .Jump, .JumpALR, .immsrc, .ALUControl);
-    datapath dp(.clk, .reset, .ResultSrc, .PCSrc, 
-                .ALUSrc, .RegWrite, .JumpALR, .immsrc, .ALUControl, .Zero,
-                .LessThan, .LessThanUnsigned, .PC, .instr, .ALUResult, .WriteData, .ReadData);
+    logic       ALUSrcD, RegWriteD, JumpD, BranchD, JumpALRD;
+    logic [1:0] ResultSrcD;
+    logic [2:0] immsrcD;
+    logic [3:0] ALUControlD;
+    logic       MemWriteD;
+    logic [31:0] instrD;
+   
+    controller c(.op(instrD[6:0]), .funct3D(instrD[14:12]), .funct7b5D(instrD[30]),
+                    .ResultSrcD, .MemWriteD, .ALUSrcD, .RegWriteD,
+                    .JumpD, .BranchD, .JumpALRD, .immsrcD, .ALUControlD);
+    datapath dp(.clk, .reset, .ResultSrcD,
+                .ALUSrcD, .RegWriteD, .JumpALRD, .JumpD, .BranchD, .immsrcD, .ALUControlD, 
+                .PC, .instrF(instr), .ALUResultE(ALUResult), 
+                .WriteDataM(WriteData), .ReadDataM(ReadData), .MemWriteD,
+                .MemWrite, .MemWriteSelect, .instrD);
 endmodule

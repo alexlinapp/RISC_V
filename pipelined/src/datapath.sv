@@ -1,47 +1,158 @@
 module datapath
+    #(parameter XLEN = 32)
     (
         input   logic           clk, reset,
-        input   logic [1:0]     ResultSrc,
-        input   logic           PCSrc, ALUSrc,
-        input   logic           RegWrite,
-        input   logic           JumpALR,
-        input   logic [2:0]     immsrc,
-        input   logic [3:0]     ALUControl,
-        input   logic [31:0]    instr,          
-        input   logic [31:0]    ReadData,
-        output  logic           Zero, LessThan, LessThanUnsigned,
-        output  logic [31:0]    ALUResult, WriteData,
-        output  logic [31:0]    PC     
+        input   logic [1:0]     ResultSrcD,
+        input   logic           ALUSrcD,
+        input   logic           RegWriteD,
+        input   logic           JumpALRD, JumpD, BranchD,
+        input   logic [2:0]     immsrcD,
+        input   logic [3:0]     ALUControlD,
+        input   logic [31:0]    instrF, 
+        input   logic           MemWriteD, 
+        input   logic [31:0]    ReadDataM,        
+        output  logic [31:0]    ALUResultE, WriteDataM,
+        output  logic [31:0]    PC,     
+        output  logic           MemWrite,
+        output  logic [3:0]     MemWriteSelect,
+        output  logic [31:0]    instrD
     );
     
-    logic [31:0] PCNext, PCPlus4, PCTarget, PCTargetJ;
-    logic [31:0] immext;
-    logic [31:0] SrcA, SrcB;
-    logic [31:0] ResultU, Result;
-    logic [31:0] ReadDataSelected;
-    
-    //  PC Next Logic
-    dff #(32)   pcreg(.clk, .reset, .d(PCNext), .q(PC));
-    adder       pcadd4(.a(PC), .b(32'b100), .y(PCPlus4));
-    adder       pcaddbranch(.a(PC), .b(immext), .y(PCTarget));  
-    mux2 #(32)  pcmux(.d0(PCPlus4), .d1(PCTargetJ), .s(PCSrc), .y(PCNext));
-    mux2 #(32)  pcJmux(.d0(PCTarget), .d1(ALUResult), .s(JumpALR), .y(PCTargetJ));
-    //  register file logic
-    regfile     rf(.clk, .we3(RegWrite), .a1(instr[19:15]), .a2(instr[24:20]), .a3(instr[11:7]), 
-                    .wd3(Result), .rd1(SrcA), .rd2(WriteData));     
-                    //  WriteData used here instead SrcB since it is WriteData signal being driven
-    extend      ext(.instr(instr[31:7]), .immsrc, .immext);
-    //  U-Type Logic instr[5] = opb5
-    mux2 #(32) resultUmux(.d0(PCTarget), .d1(immext), .s(instr[5]), .y(ResultU));  
-    
-    //  ALU Logic
-    mux2 #(32)  srcbmux(.d0(WriteData), .d1(immext), .s(ALUSrc), .y(SrcB));
-    alu         alu(.a(SrcA), .b(SrcB), .ALUControl, .ALUResult, .Zero,
-                    .LessThan, .LessThanUnsigned);
-    mux4 #(32)  resultmux(.d0(ALUResult), .d1(ReadDataSelected), 
-                            .d2(PCPlus4), .d3(ResultU), .s(ResultSrc), .y(Result));  
-    dmemselect  dmemselect1(.ReadData, .funct3(instr[14:12]), .ReadDataSelected);  
-                          
     //  pipelines: Fetch->Decode->Execute->Memory->WriteBack
-                                   
+    
+      
+    
+    //  instruction fetch signals
+    logic [31:0] PCNextF, PCPlus4F, PCTargetJF;
+    
+    //  instruction decode signals
+    logic [31:0]    RD1D, RD2D;
+    logic [31:0]    PCD;
+    logic [4:0]     Rs1D, Rs2D, RdD;
+    logic [31:0]    immextD;
+    logic [31:0]    PCPlus4D;
+    assign Rs1D = instrD[19:15];
+    assign Rs2D = instrD[24:20];
+    assign RdD = instrD[11:7];
+    
+    //  instruction execute signals
+    logic               RegWriteE, MemWriteE;
+    logic [1:0]         ResultSrcE;
+    logic               JumpE, JumpALRE, BranchE;
+    logic [3:0]         ALUControlE;
+    logic               ALUSrcE;
+    logic [2:0]         funct3E;
+    logic               ZeroE, LessThanE, LessThanUnsignedE;
+    logic               BranchCE;
+    logic [XLEN-1:0]    PCE, PCPlus4E;
+    logic [4:0]         Rs1E, Rs2E, RdE;
+    logic [XLEN-1:0]    WriteDataE;
+    logic [XLEN-1:0]    RD1E, RD2E;
+    
+    logic [XLEN-1:0]    PCSrcE;
+    logic [31:0]        immextE;
+    logic [XLEN-1:0]    SrcAE, SrcBE;
+    // instruction memory signals
+    logic               RegWriteM, MemWriteM;
+    logic [1:0]         ResultSrcM;
+    logic [XLEN-1:0]    ALUResultM;
+    logic [4:0]         RdM;
+    logic [XLEN-1:0]    PCPlus4M, PCTargetM;
+    logic [2:0]         funct3M;
+    
+    logic [3:0]         MemWriteSelectM;
+    
+    logic [31:0]        ReadDataSelectedM;
+    logic [XLEN-1:0]    ResultUM, ResultM;
+    // instruction write back signals
+    logic               RegWriteWB;
+    logic [4:0]         RdWB;
+    logic [XLEN-1:0]    ResultWB;
+    
+    
+    //  Instruction Fetch Stage
+    //  PC Next Logic
+    dff #(32)   pcreg(.clk, .reset, .d(PCNextF), .q(PC));
+    adder       pcadd4(.a(PC), .b(32'b100), .y(PCPlus4F));
+    adder       pcaddbranch(.a(PC), .b(immextD), .y(PCTarget));  
+    mux2 #(32)  pcmux(.d0(PCPlus4F), .d1(PCTargetJF), .s(PCSrcE), .y(PCNextF));
+    mux2 #(32)  pcJmux(.d0(PCTargetE), .d1(ALUResultE), .s(JumpALRE), .y(PCTargetJF));
+    
+    
+    
+    
+    //  Instruction Decode Stage
+    
+    
+    //  register file logic
+    regfile     rf(.clk, .we3(RegWriteWB), .a1(instrD[19:15]), .a2(instrD[24:20]), .a3(RdWB), 
+                    .wd3(ResultWB), .rd1(RD1D), .rd2(RD2D));     
+          
+    extend      ext(.instr(instrD[31:7]), .immsrc(immsrcD), .immext(immextD));
+    
+    
+    
+    
+    
+    
+    
+    //  execute stage
+    //  ALU Logic
+    
+    mux2 #(32)  srcbmux(.d0(WriteDataE), .d1(immextE), .s(ALUSrcE), .y(SrcBE));
+    alu         alu1(.a(SrcAE), .b(SrcBE), .ALUControl(ALUControlE), .ALUResult(ALUResultE), 
+                    .Zero(ZeroE), .LessThan(LessThanE), .LessThanUnsigned(LessThanUnsignedE));
+    
+    mux4 #(32)  forwardbmux(.d0(RD2E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardBE), .y(WriteDataE));
+    mux4 #(32)  forwardamux(.d0(RD1E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardAE), .y(SrcAE));
+    //  branch decode logic
+    
+    branchdec bd(.Zero(ZeroE), .LessThan(LessThanE), .LessThanUnsigned(LessThanUnsignedE), 
+                    .funct3(funct3E), .BranchC(BranchCE));
+    assign PCSrcE = BranchE & BranchCE | JumpE;        //  Replaced Zero with BranchC, where BranchC is the actual condition                     
+    
+    
+    
+    
+    
+    
+    
+    //  memory stage
+    assign MemWrite = MemWriteM;
+    assign MemWriteSelect = MemWriteSelectM;
+    mux4 #(32)  resultmux(.d0(ALUResultM), .d1(ReadDataSelectedM), 
+                            .d2(PCPlus4M), .d3(ResultUM), .s(ResultSrcM), .y(ResultM)); 
+    //  for writing into data memory
+    memdec memd(.MemWrite(MemWriteM), .funct3(funct3M), .MemWriteSelect(MemWriteSelectM));
+    //  for reading from data memory and into register
+    dmemselect  dmemselect1(.ReadData(ReadDataM), .funct3(funct3M), 
+                            .ReadDataSelected(ReadDataSelectedM));  
+    
+    
+    //  U-Type Logic instr[5] = opb5
+    mux2 #(32) resultUmux(.d0(PCTargetM), .d1(immextD), .s(instrD[5]), .y(ResultUM));  
+    
+    
+    //  writeback stage
+    
+    
+    
+    
+    //  Hazard Unit     
+    //  signal declaration
+    logic StallF, StallD, FlushD, FlushE;
+    logic [1:0] ForwardAE, ForwardBE; 
+    // temp values for now
+    assign StallD = 0;
+    assign StallF = 0;
+    assign ForwardAE = 2'b00;
+    assign ForwardBE = 2'b00;
+    //  pipeline registers
+    IF_ID_REG   IFIDREG(.clk, .clr(FlushD), .en(StallD), .instrF, .PCF(PC), .PCPlus4F,
+                        .instrD, .PCD, .PCPlus4D, .reset);
+    ID_EX_REG   IDEXREG(.clk, .clr(FlushE), .funct3D(instrD[14:12]), .*);
+    EX_MEM_REG  EXMEMREG(.*);
+    MEM_WB_REG  MEMWBREG(.*);
+    
+      
 endmodule
