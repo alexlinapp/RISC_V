@@ -112,8 +112,8 @@ module datapath
     alu         alu1(.a(SrcAE), .b(SrcBE), .ALUControl(ALUControlE), .ALUResult(ALUResultE), 
                     .Zero(ZeroE), .LessThan(LessThanE), .LessThanUnsigned(LessThanUnsignedE));
     //  forwarding muxes
-    mux4 #(32)  forwardbmux(.d0(RD2E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardBE), .y(WriteDataE));
-    mux4 #(32)  forwardamux(.d0(RD1E), .d1(ResultWB), .d2(ALUResultM), .s(ForwardAE), .y(SrcAE));
+    mux4 #(32)  forwardbmux(.d0(RD2E), .d1(ResultWB), .d2(ResultM), .s(ForwardBE), .y(WriteDataE));
+    mux4 #(32)  forwardamux(.d0(RD1E), .d1(ResultWB), .d2(ResultM), .s(ForwardAE), .y(SrcAE));
     //  branch decode logic
     
     branchdec bd(.Zero(ZeroE), .LessThan(LessThanE), .LessThanUnsigned(LessThanUnsignedE), 
