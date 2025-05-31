@@ -7,12 +7,14 @@ module ID_EX_REG
         input   logic           JumpD, JumpALRD, BranchD,
         input   logic [3:0]     ALUControlD,
         input   logic           ALUSrcD,
+        input   logic           op5D,
         
         output   logic          RegWriteE, MemWriteE,
         output   logic [1:0]    ResultSrcE,
         output   logic          JumpE, JumpALRE, BranchE,
         output   logic [3:0]    ALUControlE,
         output   logic          ALUSrcE,
+        output  logic           op5E,
         
         input   logic [XLEN-1:0]    RD1D, RD2D, PCD, PCPlus4D, immextD, 
         input   logic [4:0]         Rs1D, Rs2D, RdD,
@@ -44,6 +46,7 @@ module ID_EX_REG
                     RdE <= 0;
                     funct3E <= 0;
                     JumpALRE <= 0;
+                    op5E <= 0;
                 end
             else
                 begin
@@ -64,6 +67,7 @@ module ID_EX_REG
                     RdE <= RdD;
                     funct3E <= funct3D;
                     JumpALRE <= JumpALRD;
+                    op5E <= op5D;
                 end
         end
 endmodule

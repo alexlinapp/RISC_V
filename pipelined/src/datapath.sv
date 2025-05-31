@@ -50,11 +50,13 @@ module datapath
     logic [XLEN-1:0]    WriteDataE;
     logic [XLEN-1:0]    RD1E, RD2E;
     logic [XLEN-1:0]    ALUResultE;
+    logic               op5E;
     
     logic               PCSrcE;
     logic [31:0]        immextE;
     logic [XLEN-1:0]    SrcAE, SrcBE;
     logic [XLEN-1:0]    PCTargetE;
+    logic [XLEN-1:0]    ResultUE;
     // instruction memory signals
     logic               RegWriteM, MemWriteM;
     logic [1:0]         ResultSrcM;
@@ -119,7 +121,8 @@ module datapath
     assign PCSrcE = BranchE & BranchCE | JumpE;        //  Replaced Zero with BranchC, where BranchC is the actual condition                     
     
     
-    
+    //  U-Type Logic instr[5] = opb5
+    mux2 #(32) resultUmux(.d0(PCTargetE), .d1(immextE), .s(op5E), .y(ResultUE));
     
     
     
@@ -136,8 +139,7 @@ module datapath
                             .ReadDataSelected(ReadDataSelectedM));  
     
     
-    //  U-Type Logic instr[5] = opb5
-    mux2 #(32) resultUmux(.d0(PCTargetM), .d1(immextD), .s(instrD[5]), .y(ResultUM));  
+      
     
     
     //  writeback stage, none need, no components in this stage, uses other components
@@ -157,7 +159,8 @@ module datapath
     //  pipeline registers
     IF_ID_REG   IFIDREG(.clk, .clr(FlushD), .en(StallD), .instrF, .PCF(PC), .PCPlus4F,
                         .instrD, .PCD, .PCPlus4D, .reset);
-    ID_EX_REG   IDEXREG(.clk, .clr(FlushE), .funct3D(instrD[14:12]), .*);
+    ID_EX_REG   IDEXREG(.clk, .clr(FlushE), .funct3D(instrD[14:12]), 
+                        .op5D(instrD[5]), .*);
     EX_MEM_REG  EXMEMREG(.*);
     MEM_WB_REG  MEMWBREG(.*);
     
