@@ -63,6 +63,7 @@ dkms.conf
 *.ltx                       # latency reports
 *.webtalk                   # telemetry
 *.ip_user_files
+build/
 
 # Waveforms
 *.wcfg

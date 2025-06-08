@@ -39,7 +39,7 @@ module hazardunit
     //  logic to prevent fake stalls
     assign lwStall = (ResultSrcE == 2'b01) & (RdE != 5'b0) &
                         ((UsesRs1D & Rs1D == RdE) | (UsesRs2D & Rs2D == RdE));
-    logic StallF, StallD;
+
     assign StallF = lwStall;
     assign StallD = lwStall;
     
