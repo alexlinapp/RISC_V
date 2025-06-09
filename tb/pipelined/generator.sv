@@ -24,7 +24,7 @@ package gen;
     class Instruction;
         rand instr_pkg::op_t op;
         rand bit signed [31:0] imm;
-        rand bit [2:0] rd, rs1, rs2;
+        rand bit [4:0] rd, rs1, rs2;
         rand bit [2:0] funct3, funct7;
         bit signed [31:0] PC;
 
@@ -35,10 +35,14 @@ package gen;
 
         constraint op_c {
             op dist {
-                    OP_LOAD := 1,
-                    OP_IMM  := 5,
-                    OP_R    := 5
-                
+                    OP_LOAD     := 2,
+                    OP_IMM      := 2,
+                    OP_R        := 2,
+                    OP_STORE    := 1,
+                    OP_JAL      := 1,
+                    OP_JALR     := 1,
+                    OP_AUIPC    := 3,
+                    OP_LUI      := 2
                 };
             }
         constraint reg_c {
@@ -63,6 +67,13 @@ package gen;
                 imm [12:0] inside {[-1 * PC : IMEM_SIZE * 4 - 1]};
                 imm [1:0] == 0;
             }
+            else if (op == OP_IMM) {
+                if (funct3 == 3'b001)
+                    imm[11:5] == 7'b0;
+                else if (funct3 == 3'b101) {
+                    imm[11:5] inside {7'b0, 7'b0100000};
+                }
+            }
                 
 
         }
@@ -83,14 +94,18 @@ package gen;
         constraint funct7_c {
             if (op == OP_IMM && funct3 == 1)
                 funct7 == 0;
-            else if (op == OP_IMM && funct3 == 5 || op == OP_R && funct3 == 0 || op == OP_R && funct3 == 5)
-                funct7 inside {[0:1]};
-            else if (op == OP_R)
-                funct7 == 0; 
+            else if (op == OP_R) {  //  the immediate part has taken care of the funct7 for immediates
+                if (funct3 == 3'b000 || funct3 == 3'b101) {
+                    funct7 inside {7'b0, 7'b0100000};
+                }
+                else
+                    funct7 == 7'b0;
+            }
+                 
         }
         
 
-        function bit [31:0] getInstruction(input bit signed [31:0] PC);
+        function logic [31:0] getInstruction(input bit signed [31:0] PC);
             this.PC = PC;
             this.randomize();
             
@@ -106,6 +121,8 @@ package gen;
                 return {imm[20], imm[10:1], imm[11], imm[19:12]};
             else if (this.op == OP_AUIPC || this.op == OP_LUI)
                 return {imm[31:12], rd, op};
+            else if (this.op == OP_BUBBLE)
+                return {32'b0};
         endfunction
     endclass //className
 

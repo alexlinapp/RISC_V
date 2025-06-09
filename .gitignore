@@ -64,7 +64,7 @@ dkms.conf
 *.webtalk                   # telemetry
 *.ip_user_files
 build/
-
+riscv-converter
 # Waveforms
 *.wcfg
 # SDK / Vitis (if you use them)
