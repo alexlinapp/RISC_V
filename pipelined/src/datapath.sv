@@ -135,7 +135,7 @@ module datapath
     //  for writing into data memory
     memdec memd(.MemWrite(MemWriteM), .funct3(funct3M), .MemWriteSelect(MemWriteSelectM));
     //  for reading from data memory and into register
-    dmemselect  dmemselect1(.ReadData(ReadDataM), .funct3(funct3M), 
+    dmemselect  dmemselect1(.ALUResultM, .ReadData(ReadDataM), .funct3(funct3M), 
                             .ReadDataSelected(ReadDataSelectedM));  
     
     
