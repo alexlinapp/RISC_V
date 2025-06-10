@@ -4,7 +4,7 @@ package reference_model_pkg;
 
     class reference_model;
         logic [XLEN-1:0] rf [31:0];     // register file
-        logic [XLEN-1:0] IMEM [IMEM_SIZE], DMEM [DMEM_SIZE];
+        logic [XLEN-1:0] DMEM [DMEM_SIZE];
         logic [31:0] PC;
         function new();
             foreach (rf[i])
