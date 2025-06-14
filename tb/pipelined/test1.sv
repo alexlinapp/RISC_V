@@ -1,4 +1,4 @@
-import gen::*;
+import gen_pkg::*;
 import global_defs_pkg::*;
 import instr_pkg::*;
 
@@ -21,6 +21,7 @@ program automatic test1;
         //instr.reg_c.constraint_mode(0);
         for (int i = 0; i < IMEM_SIZE; i++) begin
             instr.buildRandomize(PC);
+            instr.customRandomize();
             // $write("PC: %0d\t", PC);
             $write("Opcode: %0d", instr.op);
             $display;
@@ -36,6 +37,7 @@ program automatic test1;
 
         $fclose(fd);
         $display("FINSIHEIHASKDS: BRANCHES: %0d", branchNum);
+        
     end
 
 endprogram

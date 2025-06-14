@@ -1,17 +1,8 @@
-
-package gen;
-
+`include "uvm_macros.svh"
+package gen_pkg;
+    import uvm_pkg::*;
     import instr_pkg::*;
     import global_defs_pkg::*;
-    class generateOp;
-        rand instr_pkg::op_t op;
-        //  main constraints for generating types of insutrctions
-        
-        function new();
-            
-        endfunction //new()
-    endclass //generateOP()
-
     class Instruction;
         rand instr_pkg::op_t op;
         rand logic signed [31:0] imm;
@@ -59,13 +50,16 @@ package gen;
             // $display("min_12: %0d, max_12: %0d, min_11: %0d, max_11: %0d, min_20: %0d, max_20: %0d", min_12, max_12, min_11, max_11, min_20, max_20);
             // $display("INSIDE PC: %0d", this.PC * -1);
             // $display("IMEM: %0d", IMEM_SIZE * 4 -1);
+            //  in order, first setOP, then setImm, then setFunct3, then setFunct7
+        endfunction
+
+        function void customRandomize();
             setOP();
             setImm();
             setFunct3();
             setFunct7();
         endfunction
-
-        //  using constraints skewed data too much
+        //  using constraints skewed data too much, use manual setOP
 
         function void setOP();
             randcase
@@ -79,7 +73,7 @@ package gen;
                 1: op = OP_JALR;  
                 1: op = OP_AUIPC; 
             endcase
-            $display("THIS IS THE OP WE GET: %0d", op);
+            //$display("THIS IS THE OP WE GET: %0d", op);
         endfunction
 
 
@@ -127,6 +121,7 @@ package gen;
             else if (op == OP_JALR || op == OP_BUBBLE)
                 funct3 = 3'b000;
         endfunction
+
         function setFunct7();
             if (op == OP_IMM && funct3 == 1)
                 funct7 = 0;
@@ -139,6 +134,7 @@ package gen;
             end
             
         endfunction
+
         function logic [31:0] getInstruction(input bit signed [31:0] PC);
             
             if (this.op == OP_IMM || this.op == OP_LOAD || this.op == OP_JALR)
@@ -158,6 +154,14 @@ package gen;
         endfunction
     endclass //className
 
+    class mon_sb_trans extends uvm_transaction;
+        
 
+
+        `uvm_object_utils(mon_sb_trans);
+        function new(string name = "mon_sb_trans");
+            super.new(name);
+        endfunction //new()
+    endclass //instruction_trans extends uvm_transaction
 
 endpackage
