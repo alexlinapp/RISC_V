@@ -12,8 +12,16 @@ interface cpu_if(input bit clk);
     //  inside riscvsingle
     logic [31:0]    ALUResultE;
     
-    clocking monitor_cb @(posedge clk)
-        input reset, WriteData, DataAdr, MemWrite, MemWriteSelect, ReadData, PC, instr, ALUResultE;
+    clocking monitor_cb @(posedge clk);
+        input reset; 
+        input WriteData; 
+        input DataAdr; 
+        input MemWrite;
+        input MemWriteSelect; 
+        input ReadData; 
+        input PC; 
+        input instr; 
+        input ALUResultE;
     endclocking
 
 endinterface //interfacename

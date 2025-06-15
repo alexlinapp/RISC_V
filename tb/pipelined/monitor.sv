@@ -7,23 +7,9 @@ package monitor_pkg;
     
     `define MON_IF vif.monitor_cb
     class cpu_monitor extends uvm_monitor;
-        // //  DUT Top signals
-        // logic           clk, reset,
-        // logic [31:0]    WriteData, DataAdr;
-        // logic           MemWrite;
-        // logic [3:0]     MemWriteSelect;
-        // logic [31:0]    ReadData;
-        // logic [31:0]    PC;
-        // logic [31:0]    instr;
-        // //  DUT internal signals
-
-        // //  inside riscvsingle
-        // //  necessary for forwarding logic
-        // logic [31:0]    ALUResultE;
-
         virtual cpu_if vif;
-        gen_pkg::mon_sb_trans trans;
-        uvm_analysis_port #(gen_pkg::mon_sb_trans) trans_collected_port;
+        mon_sb_trans trans;
+        uvm_analysis_port #(mon_sb_trans) trans_collected_port;
 
         `uvm_component_utils(cpu_monitor);
 
@@ -41,11 +27,12 @@ package monitor_pkg;
 
         virtual task automatic run_phase(uvm_phase phase);
             forever begin
-                
+                collect();
+                trans_collected_port.write(trans);
             end
         endtask //automatic
 
-        virtual task automatic collector();
+        virtual task automatic collect();
         @`MON_IF;
         trans.reset = `MON_IF.reset;
         trans.WriteData = `MON_IF.WriteData;

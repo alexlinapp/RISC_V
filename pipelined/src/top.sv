@@ -3,7 +3,8 @@ module top
         input   logic           clk, reset,
         output  logic [31:0]    WriteData, DataAdr,
         output  logic           MemWrite,
-        output  logic [3:0]     MemWriteSelect
+        output  logic [3:0]     MemWriteSelect,
+        cpu_if inf
     );
     
     logic [31:0] PC, instr, ReadData;
