@@ -154,14 +154,6 @@ package gen_pkg;
         endfunction
     endclass //className
 
-    class mon_sb_trans extends uvm_transaction;
-        
-
-
-        `uvm_object_utils(mon_sb_trans);
-        function new(string name = "mon_sb_trans");
-            super.new(name);
-        endfunction //new()
-    endclass //instruction_trans extends uvm_transaction
+    
 
 endpackage

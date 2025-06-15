@@ -46,49 +46,18 @@ package monitor_pkg;
         endtask //automatic
 
         virtual task automatic collector();
-            @`MON_IF;
-            
-            
+        @`MON_IF;
+        trans.reset = `MON_IF.reset;
+        trans.WriteData = `MON_IF.WriteData;
+        trans.DataAdr = `MON_IF.DataAdr;
+        trans.MemWrite = `MON_IF.MemWrite;
+        trans.MemWriteSelect = `MON_IF.MemWriteSelect;
+        trans.ReadData = `MON_IF.ReadData;
+        trans.PC = `MON_IF.PC;
+        trans.instr = `MON_IF.instr;
+        trans.ALUResultE = `MON_IF.ALUResultE;
         endtask
 
-        virtual function op_t getop();
-            ;
-            
-        endfunction
-
-        /*
-        returns: {rs2, rs1, rd}
-        */
-        virtual function op_t getreg();
-            ;
-            
-        endfunction
-        /*
-
-        */
-        virtual function op_t getfunct3();
-            ;
-            
-        endfunction
-        virtual function op_t getfunct7();
-            ;
-            
-        endfunction
-        virtual function int getimm(op_t op, logic [31:0] instr);
-            case (op)
-                OP_LOAD   : return signed'(instr[31:20]);
-                OP_IMM    : return signed'(instr[31:20]);
-                OP_STORE  : return signed'(instr[31:20]);
-                OP_R      : return 0;
-                OP_B      : return signed'({instr[31], instr[7], instr[30:25], instr[11:8], 1'b0});   
-                OP_JAL    : return signed'({{12{instr[31]}}, instr[19:12], instr[20], instr[30:25], instr[24:21], 1'b0});
-                OP_JALR   : return signed'(instr[31:20]);
-                OP_AUIPC  : return {instr[31:12], 12'b0};
-                OP_LUI    : return {instr[31:12], 12'b0};
-                OP_BUBBLE : return 0;
-                default   : $display("Incorrect op for getImm!");
-            endcase
-            
-        endfunction
+        
     endclass //cpu_monitor extends uvm_monitor
 endpackage
