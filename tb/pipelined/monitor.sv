@@ -11,7 +11,7 @@ package monitor_pkg;
         mon_sb_trans trans;
         uvm_analysis_port #(mon_sb_trans) trans_collected_port;
 
-        `uvm_component_utils(cpu_monitor);
+        `uvm_component_utils(cpu_monitor)
 
         function new(string name, uvm_component parent);
             super.new(name, parent);

@@ -4,10 +4,10 @@ module top
         output  logic [31:0]    WriteData, DataAdr,
         output  logic           MemWrite,
         output  logic [3:0]     MemWriteSelect,
-        cpu_if inf
+        output  logic [31:0]    PC, instr, ReadData
     );
     
-    logic [31:0] PC, instr, ReadData;
+    //logic [31:0] PC, instr, ReadData;
     
     //  instantiate processor and memories
     riscvsingle rvsingle(.clk, .reset, .PC, .instr,

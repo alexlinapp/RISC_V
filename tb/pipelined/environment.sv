@@ -7,7 +7,7 @@ package env_pkg;
         cpu_monitor monitor;
         cpu_scoreboard scoreboard;
 
-        `uvm_component_utils(cpu_env);
+        `uvm_component_utils(cpu_env)
 
 
         function new(string name, uvm_component parent);

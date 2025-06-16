@@ -10,8 +10,8 @@ package scoreboard_pkg;
 
         uvm_analysis_imp#(instr_pkg::mon_sb_trans, cpu_scoreboard) trans_collected_export;
 
-
-        `uvm_component_utils(cpu_scoreboard);
+        int count = 64;
+        `uvm_component_utils(cpu_scoreboard)
         function new(string name, uvm_component parent);
             super.new(name, parent);
         endfunction //new()
@@ -26,6 +26,8 @@ package scoreboard_pkg;
             $display("instr: %0h", item.instr);
             q.push_back(item.instr);
             $display("Instruction in Writeback: %0h", q.pop_front());
+            $display("Size of queue: %0d", q.size());
+            count--;
         endfunction
 
         // virtual function void compare(mons_sb_trans item);
@@ -36,7 +38,7 @@ package scoreboard_pkg;
         virtual task run_phase(uvm_phase phase);
             //super.run_phase(phase);
             phase.raise_objection(this);
-            wait (q.size() == 0); // clean wait
+            wait (count == 0); // clean wait
             phase.drop_objection(this);
             $display("===Ending Test===");
         endtask

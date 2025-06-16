@@ -30,9 +30,9 @@ program automatic test1;
                 $display("Instruction BRANCH: %0d", i);
             end
                 
-            IMEM[i] = instr.getInstruction(PC);
-            $fdisplay(fd, "%h", instr.getInstruction(PC));
-            PC += 4;
+            IMEM[i] = instr.getInstruction();
+            $fdisplay(fd, "%h", instr.getInstruction());
+            //PC += 4;
         end
 
         $fclose(fd);
