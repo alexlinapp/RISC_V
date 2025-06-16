@@ -54,6 +54,7 @@ package gen_pkg;
         endfunction
 
         function void customRandomize();
+            setreg();
             setOP();
             setFunct3();
             setFunct7();
@@ -63,20 +64,27 @@ package gen_pkg;
 
         function void setOP();
             randcase
-                1: op = OP_LUI;
+                0: op = OP_LUI;
                 2: op = OP_B;
-                2: op = OP_LOAD;
+                0: op = OP_LOAD;
                 5: op = OP_IMM;   
                 5: op = OP_R;    
-                3: op = OP_STORE; 
+                0: op = OP_STORE; 
                 2: op = OP_JAL;   
                 2: op = OP_JALR;  
-                1: op = OP_AUIPC; 
+                0: op = OP_AUIPC; 
             endcase
             //$display("THIS IS THE OP WE GET: %0d", op);
         endfunction
 
-
+        function void setreg();
+            if (!std::randomize(rs1) with {rs1 inside {[0:31]};})
+                $display("Failed to randomize rs1");
+            if (!std::randomize(rs2) with {rs2 inside {[0:31]};})
+                $display("Failed to randomize rs2");
+            if (!std::randomize(rd) with {rd inside {[0:31]};})
+                $display("Failed to randomize rsd"); 
+        endfunction
 
         function void setImm();
             if (op == OP_JALR) begin

@@ -5,12 +5,24 @@ module regfile
         input logic                 we3,
         input logic     [4:0]       a1, a2, a3,
         input logic     [XLEN-1:0]  wd3, 
-        output logic    [XLEN-1:0]  rd1, rd2
+        output logic    [XLEN-1:0]  rd1, rd2,
+        cpu_if intf     //  interface
     );
     
     //  three ported register file
     logic [XLEN-1:0] rf[31:0];
     
+    initial begin
+        for (int i = 0; i < 32; i++)
+            rf[i] = 32'b0;
+    end
+    
+    always_comb begin 
+        for (int i = 0; i < 32; i++) begin
+            intf.rf[i] = rf[i];
+        end
+    
+    end
     //  write occurs on the negative edge of clk (first half of cycle)
     //  read occurs on second half of cycle
     always_ff @(negedge clk)

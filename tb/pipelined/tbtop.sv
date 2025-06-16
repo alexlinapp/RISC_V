@@ -1,9 +1,9 @@
 module tbtop; 
-    //import uvm_pkg::*;
+    import uvm_pkg::*;
     import global_defs_pkg::*;
     import instr_pkg::*;
     import gen_pkg::*;
-    //import test_pkg::*;
+    import test_pkg::*;
     bit clk;
     bit reset;
     logic [31:0] IMEM [IMEM_SIZE];
@@ -20,7 +20,7 @@ module tbtop;
     cpu_if intf(clk);
     top cpu(.clk(intf.clk), .WriteData(intf.WriteData), .DataAdr(intf.DataAdr),
             .MemWrite(intf.MemWrite), .MemWriteSelect(intf.MemWriteSelect), .ReadData(intf.ReadData), 
-            .instr(intf.instr), .PC(intf.PC), .reset(reset));
+            .instr(intf.instr), .PC(intf.PC), .reset(reset), .intf);
 
 
     
@@ -31,8 +31,9 @@ module tbtop;
         generateInstructions(fd);
         $fclose(fd);
         $display("Im running???");
-        // uvm_config_db#(virtual cpu_if)::set(uvm_root::get(),"*","cpu_if",intf);
-        // run_test("cpu_test");
+        uvm_config_db#(virtual cpu_if)::set(uvm_root::get(),"*","cpu_if",intf);
+        run_test("cpu_test");
+        #500;
         $finish;
     end
 

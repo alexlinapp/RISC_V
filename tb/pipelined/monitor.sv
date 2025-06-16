@@ -29,6 +29,7 @@ package monitor_pkg;
             forever begin
                 collect();
                 trans_collected_port.write(trans);
+                displayReg();
             end
         endtask //automatic
 
@@ -43,8 +44,19 @@ package monitor_pkg;
         trans.PC = `MON_IF.PC;
         trans.instr = `MON_IF.instr;
         trans.ALUResultE = `MON_IF.ALUResultE;
+        trans.rf         = `MON_IF.rf;
         endtask
 
-        
+        virtual function void displayReg();
+            $display("===Reg Values===");
+            for (int i = 0; i < 32; i++) begin
+                $write("Reg %0d: %0h \t", i, trans.rf[i]);
+                if (i % 16 == 0)    begin
+                    $display();
+                end
+
+            end
+            
+        endfunction
     endclass //cpu_monitor extends uvm_monitor
 endpackage

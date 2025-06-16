@@ -11,6 +11,8 @@ interface cpu_if(input bit clk);
 
     //  inside riscvsingle
     logic [31:0]    ALUResultE;
+
+    logic [31:0]    rf [32];
     
     clocking monitor_cb @(posedge clk);
         input reset; 
@@ -22,6 +24,7 @@ interface cpu_if(input bit clk);
         input PC; 
         input instr; 
         input ALUResultE;
+        input rf;
     endclocking
 
 endinterface //interfacename

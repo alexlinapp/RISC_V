@@ -7,7 +7,8 @@ module riscvsingle
         output  logic               MemWrite,
         output  logic [3:0]         MemWriteSelect,
         output  logic [XLEN-1:0]    ALUResult, WriteData,
-        input   logic [XLEN-1:0]    ReadData
+        input   logic [XLEN-1:0]    ReadData,
+        cpu_if intf //  part of interface
     );
     
     logic       ALUSrcD, RegWriteD, JumpD, BranchD, JumpALRD;
@@ -26,5 +27,5 @@ module riscvsingle
                 .ALUSrcD, .RegWriteD, .JumpALRD, .JumpD, .BranchD, .immsrcD, .ALUControlD, 
                 .PC, .instrF(instr), .ALUResultM(ALUResult), 
                 .WriteDataM(WriteData), .ReadDataM(ReadData), .MemWriteD,
-                .MemWrite, .MemWriteSelect, .instrD, .UsesRs1D, .UsesRs2D);
+                .MemWrite, .MemWriteSelect, .instrD, .UsesRs1D, .UsesRs2D, .intf);
 endmodule

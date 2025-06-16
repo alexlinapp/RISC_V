@@ -16,12 +16,13 @@ module datapath
         output  logic [31:0]    PC,     
         output  logic           MemWrite,
         output  logic [3:0]     MemWriteSelect,
-        output  logic [31:0]    instrD
+        output  logic [31:0]    instrD,
+        cpu_if intf //  part of interface
     );
     
     //  pipelines: Fetch->Decode->Execute->Memory->WriteBack
     
-      
+     
     
     //  instruction fetch signals
     logic [31:0] PCNextF, PCPlus4F, PCTargetJF;
@@ -95,7 +96,7 @@ module datapath
     
     //  register file logic
     regfile     rf(.clk, .we3(RegWriteWB), .a1(instrD[19:15]), .a2(instrD[24:20]), .a3(RdWB), 
-                    .wd3(ResultWB), .rd1(RD1D), .rd2(RD2D));     
+                    .wd3(ResultWB), .rd1(RD1D), .rd2(RD2D), .intf);     
           
     extend      ext(.instr(instrD[31:7]), .immsrc(immsrcD), .immext(immextD));
     

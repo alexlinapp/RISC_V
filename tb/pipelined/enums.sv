@@ -1,8 +1,8 @@
-//`include "uvm_macros.svh"
+`include "uvm_macros.svh"
 package instr_pkg;
     
   import global_defs_pkg::*;
-  // import uvm_pkg::*;
+  import uvm_pkg::*;
   typedef enum logic [6:0] {
       OP_LOAD     = 7'b0000011,
       OP_IMM      = 7'b0010011,
@@ -61,24 +61,27 @@ package instr_pkg;
   endfunction
 
 
-  // class mon_sb_trans extends uvm_transaction;
-  //       logic reset;
-  //       logic [31:0]    WriteData, DataAdr;
-  //       logic           MemWrite;
-  //       logic [3:0]     MemWriteSelect;
-  //       logic [31:0]    ReadData;
-  //       logic [31:0]    PC;
-  //       logic [31:0]    instr;
-  //       //  DUT internal signals
+  class mon_sb_trans extends uvm_transaction;
+        logic reset;
+        logic [31:0]    WriteData, DataAdr;
+        logic           MemWrite;
+        logic [3:0]     MemWriteSelect;
+        logic [31:0]    ReadData;
+        logic [31:0]    PC;
+        logic [31:0]    instr;
+        //  DUT internal signals
 
-  //       //  inside riscvsingle
-  //       logic [31:0]    ALUResultE;
+        //  inside riscvsingle
+        logic [31:0]    ALUResultE;
+
+        //  part of datapath
+        logic [31:0]  rf [32];
 
 
 
-  //       `uvm_object_utils(mon_sb_trans);
-  //       function new(string name = "mon_sb_trans");
-  //           super.new(name);
-  //       endfunction //new()
-  //   endclass //instruction_trans extends uvm_transaction
+        `uvm_object_utils(mon_sb_trans);
+        function new(string name = "mon_sb_trans");
+            super.new(name);
+        endfunction //new()
+    endclass //instruction_trans extends uvm_transaction
 endpackage
