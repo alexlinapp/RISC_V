@@ -70,14 +70,14 @@ package gen_pkg;
                 0: op = OP_LUI;
                 0: op = OP_B;
                 1: op = OP_LOAD;
-                0: op = OP_IMM;   
+                1: op = OP_IMM;   
                 0: op = OP_R;    
                 0: op = OP_STORE; 
                 0: op = OP_JAL;   
                 0: op = OP_JALR;  
                 0: op = OP_AUIPC; 
             endcase
-            //$display("THIS IS THE OP WE GET: %0d", op);
+            $display("THIS IS THE OP WE GET: %0d", op);
         endfunction
 
         function void setreg();

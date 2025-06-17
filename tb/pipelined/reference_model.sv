@@ -19,13 +19,17 @@ package reference_model_pkg;
             PC = '0;
         endfunction //new()
 
-        function void expected_output(ref logic [31:0] instr, input logic [31:0] PC = 0);
+        function void expected_output(logic [31:0] instr, input logic [31:0] PC = 0);
+            int address;
+            logic [XLEN-1:0] ReadData;
             {funct7, rs2, rs1, funct3, rd, op} = instr;
             this.instr = instr;
             this.PC = PC;
+            
             if (instr[6:0] == OP_LOAD) begin
-                bit signed [31:0] address = rf[instr[19:15]] + instr[31:20];
-                logic [XLEN-1:0] ReadData = DMEM[address];
+                address = getAddress(instr, rf);
+                ReadData = DMEM[(address) >> 2];
+                $display("We are reading this data: %0h from this address: %0d", ReadData, address);
                 case (instr[14:12])
                     3'b000: begin case(address[1:0])
                             2'b00: rf[instr[11:7]] = $signed(ReadData[7:0]);

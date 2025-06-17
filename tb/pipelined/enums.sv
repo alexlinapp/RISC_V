@@ -60,10 +60,16 @@ package instr_pkg;
           
   endfunction
 
-  function automatic int getAddress(logic [31:0] instr, ref logic [31:0] rf [32]);
+  function automatic int getAddress(logic [31:0] instr, ref logic [31:0] rf [31:0]);
+    $display("inside of getAddress: getimm: %0d, rf: %0d, rfvalue: %0d", getimm(instr), getreg(instr, 1), signed'(rf[getreg(instr, 1)]));
+    $display("====GetAddress Reg===");
+    for (int i = 0; i < 32; i++) begin
+      
+      $write("Reg %0d: %0h \t", i, signed'(rf[i]));
+    end
     case (getop(instr))
-      OP_STORE: return getimm(instr) + rf[getreg(instr, 1)];
-      OP_LOAD:  return getimm(instr) + rf[getreg(instr, 1)];
+      OP_STORE: return getimm(instr) + signed'(rf[getreg(instr, 1)]);
+      OP_LOAD:  return getimm(instr) + signed'(rf[getreg(instr, 1)]);
       default: $display("Cannot get address of %0s", getop(instr).name());
     endcase
     //  should not reach here
@@ -84,7 +90,7 @@ package instr_pkg;
 
         
         //  part of datapath
-        logic [31:0]  rf [32];
+        logic [31:0]  rf [31:0];
 
         //  Memories
         logic [31:0] DMEM [DMEM_SIZE];

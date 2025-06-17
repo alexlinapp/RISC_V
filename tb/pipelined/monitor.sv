@@ -29,7 +29,7 @@ package monitor_pkg;
             forever begin
                 collect();
                 trans_collected_port.write(trans);
-                displayReg();
+                //displayReg();
             end
         endtask //automatic
 
@@ -44,8 +44,20 @@ package monitor_pkg;
         trans.PC = `MON_IF.PC;
         trans.instr = `MON_IF.instr;
         //trans.ALUResultE = `MON_IF.ALUResultE;
-        trans.rf         = `MON_IF.rf;
+        foreach(trans.rf[i]) begin
+            trans.rf[i] = `MON_IF.rf[i];
+        end       
         trans.DMEM       = `MON_IF.DMEM;
+        $display("===Trans rf Reg Values====");
+        foreach(trans.rf[i]) begin
+            
+            $write("Reg %0d: %0h \t", i, trans.rf[i]);
+        end
+        $display("===DUT Reg Values====");
+        foreach(trans.rf[i]) begin
+            
+            $write("Reg %0d: %0h \t", i, `MON_IF.rf[i]);
+        end
         endtask
 
         virtual function void displayReg();

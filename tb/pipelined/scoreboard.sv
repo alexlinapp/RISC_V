@@ -58,6 +58,7 @@ package scoreboard_pkg;
             end
             $display("Size of queue: %0d", q.size());
             count--;
+            
         endfunction
 
         // virtual function void compare_EX(input mon_sb_trans item , logic [31:0] instr);
@@ -108,6 +109,11 @@ package scoreboard_pkg;
             //  timing works out since we write back to rf on a falling edge
       
             ref_model.expected_output(instr);
+            $display("=====Expected Values from Reference Model====");
+            for (int i = 0; i < 32; i++) begin
+                $write("reg %0d: %0h \t", i, ref_model.rf[i]);
+            end
+            $display();
             
         endfunction
 
@@ -142,10 +148,10 @@ package scoreboard_pkg;
 
         // virtual function void compare(mons_sb_trans item);
         virtual function void compare_WB(input mon_sb_trans item , logic [31:0] instr);
-            case (getop(item.instr))
-                OP_LOAD  : check_OP_LOAD(item, instr);     //  timing works out since we write back to rf on a falling edge
-                OP_IMM   : assert (check_OP_IMM(item, instr)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());   
+            int check = 0;
+            case (getop(instr))
+                OP_LOAD  : check = check_OP_LOAD(item, instr);     //  timing works out since we write back to rf on a falling edge
+                OP_IMM   : check = check_OP_IMM(item, instr);
                 OP_STORE : assert(1);    
                 OP_R     : assert (check_OP_R(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());       
@@ -159,9 +165,10 @@ package scoreboard_pkg;
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
                 OP_LUI   : assert (check_OP_LUI(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_BUBBLE: assert(1);               
+                OP_BUBBLE: check = 1;               
             endcase
-            
+            assert(check)
+            else  $fatal(1, "Failed: %0s", getop(instr).name());  
         endfunction
 
 
@@ -171,13 +178,15 @@ package scoreboard_pkg;
 
         
         virtual function int check_OP_LOAD(input mon_sb_trans item , logic [31:0] instr);
-            assert (item.rf[getreg(instr, 0)] == ref_model.rf[getreg(instr, 0)]) 
+            //$display("This is getreg: %0d", getreg(instr, 0));
+            assert (item.rf[getreg(instr, 0)] === ref_model.rf[getreg(instr, 0)]) 
             else   $fatal(1, "Failed: %0s: Expected: %0h \t Actual: %0h", getop(instr).name(), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);    //  return error code of 0 if fialed
             return 1;
         endfunction
 
         virtual function int check_OP_IMM(input mon_sb_trans item , logic [31:0] instr);
-            return 1;
+            $display("Check op: rf: %0d, rfval: %0d  itemval: %0d", getreg(instr, 0), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);
+            return ref_model.rf[getreg(instr, 0)] == item.rf[getreg(instr, 0)];
             
         endfunction
         virtual function int check_OP_STORE(input mon_sb_trans item);
