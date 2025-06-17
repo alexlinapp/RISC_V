@@ -15,14 +15,14 @@ package monitor_pkg;
 
         function new(string name, uvm_component parent);
             super.new(name, parent);
-            trans = new();
             trans_collected_port = new("trans_collected_port", this);
         endfunction //new()
 
         function void build_phase(uvm_phase phase);
             super.build_phase(phase);
             if (!uvm_config_db#(virtual cpu_if)::get(this, "", "cpu_if", vif))
-                $display("Failed to get cpu virtual interface!");     
+                $display("Failed to get cpu virtual interface!"); 
+            trans = new();    
         endfunction
 
         virtual task automatic run_phase(uvm_phase phase);
@@ -35,16 +35,17 @@ package monitor_pkg;
 
         virtual task automatic collect();
         @`MON_IF;
-        trans.reset = `MON_IF.reset;
-        trans.WriteData = `MON_IF.WriteData;
-        trans.DataAdr = `MON_IF.DataAdr;
-        trans.MemWrite = `MON_IF.MemWrite;
-        trans.MemWriteSelect = `MON_IF.MemWriteSelect;
-        trans.ReadData = `MON_IF.ReadData;
+        // trans.reset = `MON_IF.reset;
+        // trans.WriteData = `MON_IF.WriteData;
+        // trans.DataAdr = `MON_IF.DataAdr;
+        // trans.MemWrite = `MON_IF.MemWrite;
+        // trans.MemWriteSelect = `MON_IF.MemWriteSelect;
+        // trans.ReadData = `MON_IF.ReadData;
         trans.PC = `MON_IF.PC;
         trans.instr = `MON_IF.instr;
-        trans.ALUResultE = `MON_IF.ALUResultE;
+        //trans.ALUResultE = `MON_IF.ALUResultE;
         trans.rf         = `MON_IF.rf;
+        trans.DMEM       = `MON_IF.DMEM;
         endtask
 
         virtual function void displayReg();

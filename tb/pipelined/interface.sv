@@ -1,3 +1,4 @@
+import global_defs_pkg::*;
 interface cpu_if(input bit clk);
     //  DUT signals; Inside top
     logic reset;
@@ -13,6 +14,9 @@ interface cpu_if(input bit clk);
     logic [31:0]    ALUResultE;
 
     logic [31:0]    rf [32];
+
+    //  memories
+    logic [31:0]    DMEM [DMEM_SIZE];
     
     clocking monitor_cb @(posedge clk);
         input reset; 
@@ -25,6 +29,7 @@ interface cpu_if(input bit clk);
         input instr; 
         input ALUResultE;
         input rf;
+        input DMEM;
     endclocking
 
 endinterface //interfacename

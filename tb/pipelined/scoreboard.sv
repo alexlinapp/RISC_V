@@ -3,15 +3,19 @@ package scoreboard_pkg;
     import uvm_pkg::*;
     import global_defs_pkg::*;
     import instr_pkg::*;
+    import reference_model_pkg::*;
     import monitor_pkg::*;
 
     class cpu_scoreboard extends uvm_scoreboard;
         
-        logic [31:0] q[$] = {0, 0, 0, 0};
+        //  queue that holds instructions
+        mon_sb_trans q[$] = {null, null, null, null};
         //  writeback, memory, execute, decode
-        logic [31:0] rf [32];
-
-
+        mon_sb_trans front;
+        //  internal state of scoreboard
+        // logic [31:0] rf [32];
+        // logic [31:0] DMEM [DMEM_SIZE];
+        reference_model ref_model;
 
         uvm_analysis_imp#(instr_pkg::mon_sb_trans, cpu_scoreboard) trans_collected_export;
 
@@ -24,82 +28,183 @@ package scoreboard_pkg;
         function void build_phase(uvm_phase phase);
             super.build_phase(phase);
             trans_collected_export = new("item_collected_export", this);
-            rf[0] = 32'b0;
+            // for (int i = 0; i < 32; i++) begin
+            //     rf[i] = 32'b0;
+            // end
+            // for (int i = 0; i < DMEM_SIZE; i++) begin
+            //     DMEM[i] = 32'b0;
+            // end
+            ref_model = new();
         endfunction
 
-        virtual function void write(mon_sb_trans item);
+        virtual function automatic void write(mon_sb_trans item);
             $display("Output from CPU Recieved");
             $display("instr: %0h", item.instr);
             if (!$isunknown(item.instr)) begin
-                q.push_back(item.instr);
-                //$display("Pushed back %0h". item.instr);
+                mon_sb_trans tmp;
+                if ($cast(tmp, item.clone())) begin
+                    q.push_back(tmp);
+                end                
+                //$display("Pushed back %0h", item.instr);
             end
-            $display("Instruction in Writeback: %0h", q.pop_front());
+            front = q.pop_front();
+            if (front) begin
+                $display("Instruction in Writeback: %0h", front.instr);
+                update_sb_WB(front.instr);
+                compare_WB(item, front.instr);  //  using the instruction frmo the pipeiline while item is current state
+            end
+            else begin
+                $display("Preloaded Instruction:");
+            end
             $display("Size of queue: %0d", q.size());
             count--;
         endfunction
 
+        // virtual function void compare_EX(input mon_sb_trans item , logic [31:0] instr);
+        //     case (getop(item.instr))
+        //         OP_LOAD  : assert (check_OP_LOAD(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());   
+        //         OP_IMM   : assert (check_OP_IMM(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());   
+        //         OP_STORE : assert (check_OP_STORE(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_R     : assert (check_OP_R(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());       
+        //         OP_B     : assert (check_OP_B(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_JAL   : assert (check_OP_JAL(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_JALR  : assert (check_OP_JALR(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_AUIPC : assert (check_OP_AUIPC(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_LUI   : assert (check_OP_LUI(item, instr)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_BUBBLE: assert(true);               
+        //     endcase
+            
+        // endfunction
+
+        // virtual function void compare_MEM(input mon_sb_trans item, logic [31:0] instr);
+        //     case (getop(item.instr))
+        //         OP_LOAD  : assert(true);   
+        //         OP_IMM   : assert(true);
+        //         OP_STORE : assert (check_OP_STORE(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_R     : assert(true);    
+        //         OP_B     : assert(true);    
+        //         OP_JAL   : assert(true);    
+        //         OP_JALR  : assert(true);  
+        //         OP_AUIPC : assert(true);    
+        //         OP_LUI   : assert(true);    
+        //         OP_BUBBLE: assert(true);               
+        //     endcase
+            
+        // endfunction
+
+
+        virtual function void update_sb_WB(logic [31:0] instr);
+            
+            //  timing works out since we write back to rf on a falling edge
+      
+            ref_model.expected_output(instr);
+            
+        endfunction
+
+        //  old/depreceated
+        // virtual function int update_sb_OP_LOAD(logic [31:0] instr);
+        //     case(instr_pkg::getfunct3(instr)) 
+        //         3'b000: rf[getreg(instr, 0)] = $signed(DMEM[getAddress(instr, rf)][7:0]);
+
+        //         3'b001: rf[getreg(instr, 0)] = $signed(DMEM[getAddress(instr, rf)][15:0]);
+            
+        //         3'b010: rf[getreg(instr, 0)] = DMEM[getAddress(instr, rf)];
+                
+
+        //         3'b100: rf[getreg(instr, 0)] = {24'b0, DMEM[getAddress(instr, rf)][7:0]};
+
+        //         3'b101: rf[getreg(instr, 0)] = {16'b0, DMEM[getAddress(instr, rf)][15:0]};
+                    
+        //         default: $fatal(1, "Incorrect funct3 field of %0s", getop(instr).name());
+        //     endcase
+        //     return 1;   //  failed to update
+        // endfunction
+
+    
+
+
+
+
+
+
+
+
+
         // virtual function void compare(mons_sb_trans item);
-        virtual function void compare(input mon_sb_trans item);
+        virtual function void compare_WB(input mon_sb_trans item , logic [31:0] instr);
             case (getop(item.instr))
-                OP_LOAD  : assert (check_OP_LOAD()) 
+                OP_LOAD  : check_OP_LOAD(item, instr);     //  timing works out since we write back to rf on a falling edge
+                OP_IMM   : assert (check_OP_IMM(item, instr)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());   
-                OP_IMM   : assert (check_OP_IMM()) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());   
-                OP_STORE : assert (check_OP_STORE()) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_R     : assert (check_OP_R()) 
+                OP_STORE : assert(1);    
+                OP_R     : assert (check_OP_R(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());       
-                OP_B     : assert (check_OP_B()) 
+                OP_B     : assert (check_OP_B(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_JAL   : assert (check_OP_JAL()) 
+                OP_JAL   : assert (check_OP_JAL(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_JALR  : assert (check_OP_JALR()) 
+                OP_JALR  : assert (check_OP_JALR(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_AUIPC : assert (check_OP_AUIPC()) 
+                OP_AUIPC : assert (check_OP_AUIPC(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_LUI   : assert (check_OP_LUI()) 
+                OP_LUI   : assert (check_OP_LUI(item)) 
                 else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_BUBBLE: assert (check_OP_LOAD()) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());                
+                OP_BUBBLE: assert(1);               
             endcase
             
         endfunction
 
-        virtual function int check_OP_LOAD();
-            
+
+
+
+
+
+        
+        virtual function int check_OP_LOAD(input mon_sb_trans item , logic [31:0] instr);
+            assert (item.rf[getreg(instr, 0)] == ref_model.rf[getreg(instr, 0)]) 
+            else   $fatal(1, "Failed: %0s: Expected: %0h \t Actual: %0h", getop(instr).name(), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);    //  return error code of 0 if fialed
             return 1;
         endfunction
 
-        virtual function int check_OP_IMM();
+        virtual function int check_OP_IMM(input mon_sb_trans item , logic [31:0] instr);
             return 1;
             
         endfunction
-        virtual function int check_OP_STORE();
+        virtual function int check_OP_STORE(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_R();
+        virtual function int check_OP_R(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_B();
+        virtual function int check_OP_B(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_JAL();
+        virtual function int check_OP_JAL(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_JALR();
+        virtual function int check_OP_JALR(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_AUIPC();
+        virtual function int check_OP_AUIPC(input mon_sb_trans item);
             return 1;
             
         endfunction
-        virtual function int check_OP_LUI();
+        virtual function int check_OP_LUI(input mon_sb_trans item);
             return 1;
             
         endfunction

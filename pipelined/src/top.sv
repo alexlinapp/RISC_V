@@ -18,5 +18,5 @@ module top
                         .MemWrite, .MemWriteSelect, .ALUResult(DataAdr), .WriteData, .ReadData,
                         .intf);
     imem imem(.a(PC), .rd(instr));
-    dmem dmem(.clk, .we(MemWriteSelect), .a(DataAdr), .wd(WriteData), .rd(ReadData));
+    dmem dmem(.clk, .we(MemWriteSelect), .a(DataAdr), .wd(WriteData), .rd(ReadData), .intf);
 endmodule

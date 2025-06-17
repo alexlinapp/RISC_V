@@ -34,17 +34,17 @@ package instr_pkg;
       /*
 
       */
-  function int getfunct3(logic [31:0] instr);
+  function logic [2:0] getfunct3(logic [31:0] instr);
       return instr[14:12];
   endfunction
 
 
-  function int getfunct7(logic [31:0] instr);
+  function logic [6:0] getfunct7(logic [31:0] instr);
       return instr[31:25];        
   endfunction
 
   function int getimm(logic [31:0] instr);
-          case (instr[6:0])
+          case (getop(instr))
               OP_LOAD   : return signed'(instr[31:20]);
               OP_IMM    : return signed'(instr[31:20]);
               OP_STORE  : return signed'(instr[31:20]);
@@ -60,6 +60,17 @@ package instr_pkg;
           
   endfunction
 
+  function automatic int getAddress(logic [31:0] instr, ref logic [31:0] rf [32]);
+    case (getop(instr))
+      OP_STORE: return getimm(instr) + rf[getreg(instr, 1)];
+      OP_LOAD:  return getimm(instr) + rf[getreg(instr, 1)];
+      default: $display("Cannot get address of %0s", getop(instr).name());
+    endcase
+    //  should not reach here
+    return 0;
+    
+  endfunction
+
 
   class mon_sb_trans extends uvm_transaction;
         logic reset;
@@ -71,17 +82,29 @@ package instr_pkg;
         logic [31:0]    instr;
         //  DUT internal signals
 
-        //  inside riscvsingle
-        logic [31:0]    ALUResultE;
-
+        
         //  part of datapath
         logic [31:0]  rf [32];
 
+        //  Memories
+        logic [31:0] DMEM [DMEM_SIZE];
+
+        //  inside riscvsingle
+        logic [31:0]    ALUResultE;
 
 
-        `uvm_object_utils(mon_sb_trans);
+
+        `uvm_object_utils_begin(mon_sb_trans)
+          `uvm_field_int(instr, UVM_DEFAULT)
+          `uvm_field_int(PC, UVM_DEFAULT)
+
+
+        `uvm_object_utils_end
         function new(string name = "mon_sb_trans");
             super.new(name);
         endfunction //new()
     endclass //instruction_trans extends uvm_transaction
+
+
+    
 endpackage
