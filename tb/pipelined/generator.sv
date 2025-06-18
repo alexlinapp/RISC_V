@@ -71,7 +71,7 @@ package gen_pkg;
                 0: op = OP_B;
                 1: op = OP_LOAD;
                 1: op = OP_IMM;   
-                0: op = OP_R;    
+                2: op = OP_R;    
                 0: op = OP_STORE; 
                 0: op = OP_JAL;   
                 0: op = OP_JALR;  

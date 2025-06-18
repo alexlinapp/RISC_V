@@ -47,18 +47,24 @@ package monitor_pkg;
         foreach(trans.rf[i]) begin
             trans.rf[i] = `MON_IF.rf[i];
         end       
-        trans.DMEM       = `MON_IF.DMEM;
-        $display("===Trans rf Reg Values====");
-        foreach(trans.rf[i]) begin
+        // $display("===Trans rf Reg Values====");
+        // foreach(trans.rf[i]) begin
             
-            $write("Reg %0d: %0h \t", i, trans.rf[i]);
-        end
-        $display("===DUT Reg Values====");
-        foreach(trans.rf[i]) begin
+        //     $write("Reg %0d: %0h \t", i, trans.rf[i]);
+        // end
+        // $display("===DUT Reg Values====");
+        // foreach(trans.rf[i]) begin
             
-            $write("Reg %0d: %0h \t", i, `MON_IF.rf[i]);
+        //     $write("Reg %0d: %0h \t", i, `MON_IF.rf[i]);
+        // end
+        //$display("===Memory====");
+        foreach(trans.DMEM[i]) begin
+            trans.DMEM[i]  = `MON_IF.DMEM[i];
+            //$write("i: %0d, trans: %0h, DUT: %0h \t", i, trans.DMEM[i], `MON_IF.DMEM[i]);
         end
+        //$display();
         endtask
+       
 
         virtual function void displayReg();
             $display("===Reg Values===");

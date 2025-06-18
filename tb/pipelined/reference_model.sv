@@ -3,8 +3,8 @@ package reference_model_pkg;
     import instr_pkg::*;
     class reference_model;
         logic [XLEN-1:0] rf [31:0];     // register file
-        logic [XLEN-1:0] DMEM [DMEM_SIZE];
-        logic [XLEN-1:0] IMEM [IMEM_SIZE];
+        logic [XLEN-1:0] DMEM [DMEM_SIZE-1:0];
+        logic [XLEN-1:0] IMEM [IMEM_SIZE-1:0];
         logic [31:0] PC;
         logic [2:0] funct3;
         logic [6:0] funct7;
@@ -69,7 +69,7 @@ package reference_model_pkg;
                 expected_OP_STORE();
             end
             else if (instr[6:0] == OP_B) begin
-
+                expected_OP_B();
             end
             else if (instr[6:0] == OP_JAL) begin
                 expected_OP_JAL();
@@ -100,6 +100,9 @@ package reference_model_pkg;
 
         function void expected_ALU_OP();
             logic [31:0] secondInput; 
+            if (rd == 0) begin
+                return;
+            end
             if (op == OP_IMM)
                 secondInput = {{21{funct7[6]}}, funct7[5:0], rs2};
             else if (op == OP_R)

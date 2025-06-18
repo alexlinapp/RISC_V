@@ -19,7 +19,7 @@ package scoreboard_pkg;
 
         uvm_analysis_imp#(instr_pkg::mon_sb_trans, cpu_scoreboard) trans_collected_export;
 
-        int count = 64;
+        int count = 100;
         `uvm_component_utils(cpu_scoreboard)
         function new(string name, uvm_component parent);
             super.new(name, parent);
@@ -28,12 +28,6 @@ package scoreboard_pkg;
         function void build_phase(uvm_phase phase);
             super.build_phase(phase);
             trans_collected_export = new("item_collected_export", this);
-            // for (int i = 0; i < 32; i++) begin
-            //     rf[i] = 32'b0;
-            // end
-            // for (int i = 0; i < DMEM_SIZE; i++) begin
-            //     DMEM[i] = 32'b0;
-            // end
             ref_model = new();
         endfunction
 
@@ -51,7 +45,8 @@ package scoreboard_pkg;
             if (front) begin
                 $display("Instruction in Writeback: %0h", front.instr);
                 update_sb_WB(front.instr);
-                compare_WB(item, front.instr);  //  using the instruction frmo the pipeiline while item is current state
+                //compare_WB(item, front.instr);  //  using the instruction frmo the pipeiline while item is current state
+                check_OP(item);
             end
             else begin
                 $display("Preloaded Instruction:");
@@ -109,11 +104,6 @@ package scoreboard_pkg;
             //  timing works out since we write back to rf on a falling edge
       
             ref_model.expected_output(instr);
-            $display("=====Expected Values from Reference Model====");
-            for (int i = 0; i < 32; i++) begin
-                $write("reg %0d: %0h \t", i, ref_model.rf[i]);
-            end
-            $display();
             
         endfunction
 
@@ -147,76 +137,88 @@ package scoreboard_pkg;
 
 
         // virtual function void compare(mons_sb_trans item);
-        virtual function void compare_WB(input mon_sb_trans item , logic [31:0] instr);
-            int check = 0;
-            case (getop(instr))
-                OP_LOAD  : check = check_OP_LOAD(item, instr);     //  timing works out since we write back to rf on a falling edge
-                OP_IMM   : check = check_OP_IMM(item, instr);
-                OP_STORE : assert(1);    
-                OP_R     : assert (check_OP_R(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());       
-                OP_B     : assert (check_OP_B(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_JAL   : assert (check_OP_JAL(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_JALR  : assert (check_OP_JALR(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_AUIPC : assert (check_OP_AUIPC(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_LUI   : assert (check_OP_LUI(item)) 
-                else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
-                OP_BUBBLE: check = 1;               
-            endcase
-            assert(check)
-            else  $fatal(1, "Failed: %0s", getop(instr).name());  
-        endfunction
-
-
-
+        // virtual function void compare_WB(input mon_sb_trans item , logic [31:0] instr);
+        //     int check = 0;
+        //     case (getop(instr))
+        //         OP_LOAD  : check = check_OP_LOAD(item, instr);     //  timing works out since we write back to rf on a falling edge
+        //         OP_IMM   : check = check_OP_IMM(item, instr);
+        //         OP_STORE : assert(1);    
+        //         OP_R     : assert (check_OP_R(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());       
+        //         OP_B     : assert (check_OP_B(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_JAL   : assert (check_OP_JAL(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_JALR  : assert (check_OP_JALR(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_AUIPC : assert (check_OP_AUIPC(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_LUI   : assert (check_OP_LUI(item)) 
+        //         else   $fatal(1, "Failed: %0s", getop(item.instr).name());    
+        //         OP_BUBBLE: check = 1;               
+        //     endcase
+        //     assert(check)
+        //     else  $fatal(1, "Failed: %0s", getop(instr).name());  
+        // endfunction
 
 
 
         
-        virtual function int check_OP_LOAD(input mon_sb_trans item , logic [31:0] instr);
-            //$display("This is getreg: %0d", getreg(instr, 0));
-            assert (item.rf[getreg(instr, 0)] === ref_model.rf[getreg(instr, 0)]) 
-            else   $fatal(1, "Failed: %0s: Expected: %0h \t Actual: %0h", getop(instr).name(), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);    //  return error code of 0 if fialed
+        virtual function int check_OP(input mon_sb_trans item);
+            foreach(item.rf[i]) begin
+                assert(item.rf[i] === ref_model.rf[i])
+                else $fatal(1, "Error: Register %0d: Expected: %0d: Output: %0d", i, ref_model.rf[i], item.rf[i]);
+            end
+            foreach(item.DMEM[i]) begin
+                assert(item.rf[i] === ref_model.rf[i])
+                else $fatal(1, "Error: Memory %0d: Expected: %0d: Output: %0d", i * 4, ref_model.DMEM[i], item.DMEM[i]);
+            end
             return 1;
         endfunction
 
-        virtual function int check_OP_IMM(input mon_sb_trans item , logic [31:0] instr);
-            $display("Check op: rf: %0d, rfval: %0d  itemval: %0d", getreg(instr, 0), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);
-            return ref_model.rf[getreg(instr, 0)] == item.rf[getreg(instr, 0)];
+        //  Depreceated
+
+
+        // virtual function int check_OP_LOAD(input mon_sb_trans item , logic [31:0] instr);
+        //     //$display("This is getreg: %0d", getreg(instr, 0));
+        //     assert (item.rf[getreg(instr, 0)] === ref_model.rf[getreg(instr, 0)]) 
+        //     else   $fatal(1, "Failed: %0s: Expected: %0h \t Actual: %0h", getop(instr).name(), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);    //  return error code of 0 if fialed
+        //     return 1;
+        // endfunction
+
+        // virtual function int check_OP_IMM(input mon_sb_trans item , logic [31:0] instr);
+        //     $display("Check op: rf: %0d, rfval: %0d  itemval: %0d", getreg(instr, 0), ref_model.rf[getreg(instr, 0)], item.rf[getreg(instr, 0)]);
+        //     return ref_model.rf[getreg(instr, 0)] == item.rf[getreg(instr, 0)];
             
-        endfunction
-        virtual function int check_OP_STORE(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_STORE(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_R(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_R(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_B(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_B(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_JAL(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_JAL(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_JALR(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_JALR(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_AUIPC(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_AUIPC(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
-        virtual function int check_OP_LUI(input mon_sb_trans item);
-            return 1;
+        // endfunction
+        // virtual function int check_OP_LUI(input mon_sb_trans item);
+        //     return 1;
             
-        endfunction
+        // endfunction
             
         // endfunction
 
@@ -224,6 +226,14 @@ package scoreboard_pkg;
             //super.run_phase(phase);
             phase.raise_objection(this);
             wait (q.size() == 0 || count <= 0); // clean wait, need to prevent infinite loops as well
+            $display("====Final Reg Values=====");
+            foreach(ref_model.rf[i]) begin
+                $write("Reg %0d: %0h \t", i, ref_model.rf[i]);
+            end
+            $display("====Final Mem Values====");
+            foreach(ref_model.DMEM[i]) begin
+                $write("DMEM[%0d]: %0h \t", i * 4, ref_model.DMEM[i]);
+            end
             phase.drop_objection(this);
             $display("===Ending Test===");
         endtask
