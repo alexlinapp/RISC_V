@@ -6,7 +6,8 @@ module testbench();
     logic [3:0]     MemWriteSelect;
     
     //  instantiate device to be tested
-    top dut(.clk, .reset, .WriteData, .DataAdr, .MemWrite, .MemWriteSelect);
+    cpu_if intf(.clk);
+    top dut(.clk, .reset, .WriteData, .DataAdr, .MemWrite, .MemWriteSelect, .intf);
     
     //  initialize test
     initial

@@ -11,7 +11,7 @@ module aludec
     
     always_comb
         case(ALUOp)
-            2'b00:      ALUControl = 4'b000;    //  addition
+            2'b00:      ALUControl = 4'b000;    //  addition for loads and stores
             2'b01:      ALUControl = 4'b0001;   //  subtraction for Branch
             default:    case(funct3)            //  R-type or I-type ALU    
                             3'b000:     if (RtypeSub)

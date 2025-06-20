@@ -2,7 +2,7 @@ module datapath
     #(parameter XLEN = 32)
     (
         input   logic           clk, reset,
-        input   logic [1:0]     ResultSrcD,
+        input   logic [2:0]     ResultSrcD,
         input   logic           ALUSrcD,
         input   logic           RegWriteD,
         input   logic           JumpALRD, JumpD, BranchD,
@@ -11,7 +11,8 @@ module datapath
         input   logic [31:0]    instrF, 
         input   logic           MemWriteD, 
         input   logic [31:0]    ReadDataM, 
-        input   logic           UsesRs1D, UsesRs2D,       
+        input   logic           UsesRs1D, UsesRs2D, 
+        input   logic           CSRWriteD,      
         output  logic [31:0]    ALUResultM, WriteDataM,
         output  logic [31:0]    PC,     
         output  logic           MemWrite,
@@ -39,7 +40,7 @@ module datapath
     
     //  instruction execute signals
     logic               RegWriteE, MemWriteE;
-    logic [1:0]         ResultSrcE;
+    logic [2:0]         ResultSrcE;
     logic               JumpE, JumpALRE, BranchE;
     logic [3:0]         ALUControlE;
     logic               ALUSrcE;
@@ -60,7 +61,8 @@ module datapath
     logic [XLEN-1:0]    ResultUE;
     // instruction memory signals
     logic               RegWriteM, MemWriteM;
-    logic [1:0]         ResultSrcM;
+    logic [2:0]         ResultSrcM;
+    //logic [2:0]         ResultSrcM1;
     logic [4:0]         RdM;
     logic [XLEN-1:0]    PCPlus4M, PCTargetM;
     logic [2:0]         funct3M;
@@ -69,6 +71,10 @@ module datapath
     
     logic [31:0]        ReadDataSelectedM;
     logic [XLEN-1:0]    ResultUM, ResultM;
+    
+        //  result signal assignment
+    logic [31:0] dResultM [7:0];    
+    
     // instruction write back signals
     logic               RegWriteWB;
     logic [4:0]         RdWB;
@@ -100,6 +106,7 @@ module datapath
           
     extend      ext(.instr(instrD[31:7]), .immsrc(immsrcD), .immext(immextD));
     
+    //  CSR register file
     
     
     
@@ -125,12 +132,25 @@ module datapath
     //  U-Type Logic instr[5] = opb5
     mux2 #(32) resultUmux(.d0(PCTargetE), .d1(immextE), .s(op5E), .y(ResultUE));
     
+    //  CSR logic
+    
     
     
     
     //  memory stage
     assign MemWrite = MemWriteM;
     assign MemWriteSelect = MemWriteSelectM;
+    
+    //  test code
+//    logic [31:0] ResultM1;
+//    assign ResultSrcM1 = ResultSrcM;
+    always_comb begin
+        dResultM[0] = ALUResultM;
+        dResultM[1] = ReadDataSelectedM;
+        dResultM[2] = PCPlus4M;
+        dResultM[3] = ResultUM;
+    end
+    //mux8 #(32)  resultmux1(.d(dResultM), .s(ResultSrcM), .y(ResultM));
     mux4 #(32)  resultmux(.d0(ALUResultM), .d1(ReadDataSelectedM), 
                             .d2(PCPlus4M), .d3(ResultUM), .s(ResultSrcM), .y(ResultM)); 
     //  for writing into data memory

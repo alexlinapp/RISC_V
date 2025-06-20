@@ -31,3 +31,25 @@ module regfile
     assign rd1 = (a1 != 0) ? rf[a1] : 0;   //  of a1 = 0, zero register by definition holds 0
     assign rd2 = (a2 != 0) ? rf[a2] : 0;
 endmodule
+
+
+module csr_regfile
+    (
+        input   logic               clk,
+        input   logic               we,
+        input   logic [11:0]        address,
+        input   logic [31:0]        writeData,
+        output  logic [31:0]        readData  
+    );
+    
+    logic [31:0] csr_rf [4095:0];
+    
+    always_ff @(negedge clk) begin
+        if (we)
+            csr_rf[address] <= writeData;
+    end
+    
+    assign readData = csr_rf[address];
+
+
+endmodule

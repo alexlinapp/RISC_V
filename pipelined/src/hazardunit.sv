@@ -5,7 +5,7 @@ module hazardunit
         input   logic [4:0]             RdE, RdM, RdWB,
         input   logic                   RegWriteM, RegWriteWB,
         input   logic                   UsesRs1D, UsesRs2D,
-        input   logic [1:0]             ResultSrcE,
+        input   logic [2:0]             ResultSrcE,
         input   logic                   PCSrcE,
         output  logic                   StallF, StallD,
         output  logic                   FlushE, FlushD,
@@ -37,7 +37,7 @@ module hazardunit
     //  Stall when load hazard, then use the above forwarding logic afterwards
     logic lwStall;
     //  logic to prevent fake stalls
-    assign lwStall = (ResultSrcE == 2'b01) & (RdE != 5'b0) &
+    assign lwStall = (ResultSrcE == 3'b001) & (RdE != 5'b0) &
                         ((UsesRs1D & Rs1D == RdE) | (UsesRs2D & Rs2D == RdE));
 
     assign StallF = lwStall;

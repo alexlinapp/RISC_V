@@ -3,14 +3,14 @@ module ID_EX_REG
     (
         input   logic           clk, clr, reset,
         input   logic           RegWriteD, MemWriteD,
-        input   logic [1:0]     ResultSrcD,
+        input   logic [2:0]     ResultSrcD,
         input   logic           JumpD, JumpALRD, BranchD,
         input   logic [3:0]     ALUControlD,
         input   logic           ALUSrcD,
         input   logic           op5D,
         
         output   logic          RegWriteE, MemWriteE,
-        output   logic [1:0]    ResultSrcE,
+        output   logic [2:0]    ResultSrcE,
         output   logic          JumpE, JumpALRE, BranchE,
         output   logic [3:0]    ALUControlE,
         output   logic          ALUSrcE,

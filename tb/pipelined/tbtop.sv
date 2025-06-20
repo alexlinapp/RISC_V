@@ -25,11 +25,11 @@ module tbtop;
 
     
     initial begin
-        automatic int fd = $fopen("C:/Users/NODDL/RISC_V/pipelined/testfiles/testv1.txt", "w");
-        if (!fd)
-            $fatal(1, "Fatal: Failed to open testfile");
-        generateInstructions(fd);
-        $fclose(fd);
+        // automatic int fd = $fopen("C:/Users/NODDL/RISC_V/pipelined/testfiles/testv1.txt", "w");
+        // if (!fd)
+        //     $fatal(1, "Fatal: Failed to open testfile");
+        // generateInstructions(fd);
+        // $fclose(fd);
         $display("Im running???");
         uvm_config_db#(virtual cpu_if)::set(uvm_root::get(),"*","cpu_if",intf);
         run_test("cpu_test");
