@@ -2,7 +2,7 @@ module lu
     (
         input   logic [31:0]    a,  //  a will always be csr
         input   logic [31:0]    b,  //  b will always be rs1 or uimm
-        input   logic [31:0]    funct3,
+        input   logic [2:0]     funct3,
         output  logic [31:0]    csrData,
         output  logic [31:0]    regData
     );
@@ -17,7 +17,7 @@ module lu
         3'b101: csrData = uimm;
         3'b110: csrData = a | uimm;
         3'b111: csrData = a & ~uimm;
-        default: y = 'x;  
+        default: csrData = 'x;  
     endcase
     
     end

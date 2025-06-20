@@ -7,6 +7,7 @@ module hazardunit
         input   logic                   UsesRs1D, UsesRs2D,
         input   logic [2:0]             ResultSrcE,
         input   logic                   PCSrcE,
+        input   logic [11:0]            CSRAddress,
         output  logic                   StallF, StallD,
         output  logic                   FlushE, FlushD,
         output  logic [1:0]             ForwardAE, ForwardBE
@@ -46,4 +47,9 @@ module hazardunit
     //  Flush when branch taken or load introduces bubble
     assign FlushD = PCSrcE;
     assign FlushE = PCSrcE | lwStall;
+    
+    //  Forwarding for CSR Data hazard RAW 
+    
+    
+    
 endmodule

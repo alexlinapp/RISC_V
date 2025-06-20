@@ -42,9 +42,17 @@ module csr_regfile
         output  logic [31:0]        readData  
     );
     
-    logic [31:0] csr_rf [4095:0];
+    logic [31:0] csr_rf [10:0];
     
-    always_ff @(negedge clk) begin
+    initial begin
+        for (int i = 0; i < 11; i++) begin
+            csr_rf[i] = '0;
+        end
+    
+    end
+    
+    //  avaiable/write at the end of the cycle
+    always_ff @(posedge clk) begin
         if (we)
             csr_rf[address] <= writeData;
     end

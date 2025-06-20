@@ -10,6 +10,9 @@ module csrdec(
             endcase
         
         end
-        CSRWrite = 0;
+        else begin
+            CSRWrite = 0;
+        end
+        
     end
 endmodule

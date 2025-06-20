@@ -59,6 +59,11 @@ module datapath
     logic [XLEN-1:0]    SrcAE, SrcBE;
     logic [XLEN-1:0]    PCTargetE;
     logic [XLEN-1:0]    ResultUE;
+    logic               CSRWriteE;
+    logic [XLEN-1:0]    CSRSrcAE, CSRSrcBE;
+    logic [XLEN-1:0]    CSRDataE, CSRRegDataE;
+    logic [XLEN-1:0]    CSRRDE;
+    
     // instruction memory signals
     logic               RegWriteM, MemWriteM;
     logic [2:0]         ResultSrcM;
@@ -71,7 +76,7 @@ module datapath
     
     logic [31:0]        ReadDataSelectedM;
     logic [XLEN-1:0]    ResultUM, ResultM;
-    
+    logic [XLEN-1:0]    CSRRegDataM;
         //  result signal assignment
     logic [31:0] dResultM [7:0];    
     
@@ -79,8 +84,6 @@ module datapath
     logic               RegWriteWB;
     logic [4:0]         RdWB;
     logic [XLEN-1:0]    ResultWB;
-    
-    
     //  Hazard Unit Signal Declaration
     logic StallF, StallD, FlushD, FlushE;
     logic [1:0] ForwardAE, ForwardBE; 
@@ -108,6 +111,10 @@ module datapath
     
     //  CSR register file
     
+    csr_regfile csr_rf(.clk, .we(CSRWriteE), .address(immextE[11:0]), .writeData(CSRDataE),
+                        .readData(CSRRDE));
+    
+    
     
     
     
@@ -133,8 +140,10 @@ module datapath
     mux2 #(32) resultUmux(.d0(PCTargetE), .d1(immextE), .s(op5E), .y(ResultUE));
     
     //  CSR logic
-    
-    
+        //  put in the execute and not memory stage since not using ALU
+    mux2 #(32) CSRmux(.d0(SrcAE), .d1(Rs1E), .s(funct3E[2]), .y(CSRSrcBE));
+    lu CSRlu(.a(CSRRDE), .b(CSRSrcBE), .funct3(funct3E), 
+                .csrData(CSRDataE), .regData(CSRRegDataE));
     
     
     //  memory stage
@@ -149,10 +158,11 @@ module datapath
         dResultM[1] = ReadDataSelectedM;
         dResultM[2] = PCPlus4M;
         dResultM[3] = ResultUM;
+        dResultM[4] = CSRRegDataM;
     end
-    //mux8 #(32)  resultmux1(.d(dResultM), .s(ResultSrcM), .y(ResultM));
-    mux4 #(32)  resultmux(.d0(ALUResultM), .d1(ReadDataSelectedM), 
-                            .d2(PCPlus4M), .d3(ResultUM), .s(ResultSrcM), .y(ResultM)); 
+    mux8 #(32)  resultmux(.d(dResultM), .s(ResultSrcM), .y(ResultM));
+//    mux4 #(32)  resultmux(.d0(ALUResultM), .d1(ReadDataSelectedM), 
+//                            .d2(PCPlus4M), .d3(ResultUM), .s(ResultSrcM), .y(ResultM)); 
     //  for writing into data memory
     memdec memd(.MemWrite(MemWriteM), .funct3(funct3M), .MemWriteSelect(MemWriteSelectM));
     //  for reading from data memory and into register
@@ -171,7 +181,7 @@ module datapath
     //  Hazard Unit     
     
     
-    hazardunit HU(.*);
+    hazardunit HU(.*, .CSRAddress(immextE[11:0]));
     // temp values for now
 //    assign StallD = 0;
 //    assign StallF = 0;

@@ -8,6 +8,7 @@ module ID_EX_REG
         input   logic [3:0]     ALUControlD,
         input   logic           ALUSrcD,
         input   logic           op5D,
+        input   logic           CSRWriteD,
         
         output   logic          RegWriteE, MemWriteE,
         output   logic [2:0]    ResultSrcE,
@@ -15,6 +16,7 @@ module ID_EX_REG
         output   logic [3:0]    ALUControlE,
         output   logic          ALUSrcE,
         output  logic           op5E,
+        output  logic           CSRWriteE,
         
         input   logic [XLEN-1:0]    RD1D, RD2D, PCD, PCPlus4D, immextD, 
         input   logic [4:0]         Rs1D, Rs2D, RdD,
@@ -47,6 +49,7 @@ module ID_EX_REG
                     funct3E <= 0;
                     JumpALRE <= 0;
                     op5E <= 0;
+                    CSRWriteE <= 0;
                 end
             else
                 begin
@@ -68,6 +71,7 @@ module ID_EX_REG
                     funct3E <= funct3D;
                     JumpALRE <= JumpALRD;
                     op5E <= op5D;
+                    CSRWriteE <= CSRWriteD;
                 end
         end
 endmodule
